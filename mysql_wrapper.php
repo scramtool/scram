@@ -118,6 +118,11 @@ class mysql_wrapper  extends database_wrapper
 		return !is_bool( $this->connection);
 	}
 
+	function escape( $string)
+	{
+		return mysql_real_escape_string($string);
+	}
+	
 	var $connection;
 }
 ?>

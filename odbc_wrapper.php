@@ -86,6 +86,11 @@ class odbc_wrapper  extends database_wrapper
 		return !is_bool($this->connection);
 	}
 
+	function escape( $string)
+	{
+		return addslashes($string);
+	}
+	
 	var $connection;
 }
 ?>
