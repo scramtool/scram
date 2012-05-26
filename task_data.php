@@ -3,26 +3,25 @@ require_once 'connect_db.inc.php';
 
 class Task
 {
-	function __construct( $id, $description, $resource)
+	function __construct( $id, $description, $state, $resource)
 	{
-		$this->id = $id + 0;
-		$this->description = $description;
-		if (isset( $resource))
-		{
-			$this->resources[] = $resource + 0;
-		}
+		$this->id 			= $id + 0;
+		$this->description 	= $description;
+		$this->state 		= $state;
+		$this->resource 	= $resource + 0;
 	}
 	
 	var $id;
 	var $description;
-	var $resources = array();
+	var $state;
+	var $resource;
 }
 
 function get_task_query( $sprint_id)
 {
 	global $database;
 	$sprint_id = $database->escape( $sprint_id);
-	return "select task.*, task_resource.resource_id from task left outer join task_resource on task.task_id = task_resource.task_id where sprint_id = $sprint_id order by task_id";
+	return "select * from task where sprint_id = $sprint_id order by task_id";
 }
 
 function print_task_data( $sprint_id)
