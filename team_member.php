@@ -27,7 +27,8 @@ $member_id = $member['resource_id'];
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<link href="css/start/jquery-ui-1.8.20.custom.css" rel="stylesheet" type="text/css"/>
+<link href="css/smoothness/jquery-ui-1.8.20.custom.css" rel="stylesheet" type="text/css"/>
+<link href="css/scram.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="scripts/jquery-1.7.2.min.js"/></script>
 <script type="text/javascript" src="scripts/jquery-ui-1.8.20.custom.min.js"/></script>
 <script type="text/javascript" src="scripts/scram.js"></script>
@@ -35,21 +36,11 @@ $member_id = $member['resource_id'];
 var member_id = <?=$member_id?>;
 var member_name = '<?=$member_name?>';
 var need_identification = <?=$need_identification?1:0?>;
+var sprint_id = 1;
+var tasks = new Array();
 $(document).ready(function() {
-	loadTasks( 1, function( task) {
-		item = $('<li/>', {'class': 'taskNote', 'html':makeTaskMarkup( task, worksOnTask( member_id, task))});
-		if (worksOnTask( member_id, task))
-		{
-			item.appendTo("#taskList");
-		}
-		else
-		{
-			list = '#' + task.status + 'List';
-			item.appendTo( list);
-		}
+	loadTasks( sprint_id);
 	});
-	$("#allTasks").accordion({autoheight:false});
-});
 </script>
 <title>Task overview for <?=$member_name?></title>
 </head>
@@ -62,22 +53,19 @@ $(document).ready(function() {
 <li>team member page
 </ul>
 </div>
-<div class="scrumBoardTasks" id="tasks">
-<h2>Tasks</h2>
-<ul id = "taskList">
-</ul>
-<div id="allTasks" style="bottom:0;left:0;">
-    <h3><a href="#">To Do</a></h3>
-    <div class="scrumBoardTasks"><ul id="toDoList"></ul></div>
-    <h3><a href="#">In Progress</a></h3>
-    <div class="scrumBoardTasks"><ul id="inProgressList"></ul></div>
-    <h3><a href="#">To be Verified</a></h3>
-    <div class="scrumBoardTasks"><ul id="toBeVerifiedList"></ul></div>
-    <h3><a href="#">Done</a></h3>
-    <div class="scrumBoardTasks"><ul id="doneList"></ul></div>
-    <h3><a href="#">Forwarded</a></h3>
-    <div class="forwardedTasks"><ul id="forwardedList"></ul></div>
-</div>
+<div class="mainBody" id="tasks">
+    <h3 class="taskCategoryHeader"><a href="#">My Tasks</a></h3>
+    <div class="scrumBoardTasks"><ul id="myTasks" class="taskList"></ul><br style="clear:both;"/></div>
+    <h3 class="taskCategoryHeader"><a href="#">To Do</a></h3>
+    <div class="scrumBoardTasks"><ul id="toDoList" class="taskList"></ul><br style="clear:both;"/></div>
+    <h3 class="taskCategoryHeader"><a href="#">In Progress</a></h3>
+    <div class="scrumBoardTasks"><ul id="inProgressList" class="taskList"></ul><br style="clear:both;"/></div>
+    <h3 class="taskCategoryHeader"><a href="#">To be Verified</a></h3>
+    <div class="scrumBoardTasks"><ul id="toBeVerifiedList" class="taskList"></ul><br style="clear:both;"/></div>
+    <h3 class="taskCategoryHeader"><a href="#">Done</a></h3>
+    <div class="scrumBoardTasks"><ul id="doneList" class="taskList"></ul><br style="clear:both;"/></div>
+    <h3 class="taskCategoryHeader"><a href="#">Forwarded</a></h3>
+    <div class="scrumBoardTasks forwardedTasks"><ul id="forwardedList" class="taskList"></ul><br style="clear:both;"/></div>
 </div>
 </body>
 </html>
