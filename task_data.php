@@ -96,7 +96,7 @@ function handle_move( $task_id, $status, $owner)
 	
 	if (isset( $owner))
 	{
-		$owner = $database-escapeshellarg($owner);
+		$owner = $database->escape($owner);
 		$owner_update = ", resource_id = $owner";
 	}
 	else {

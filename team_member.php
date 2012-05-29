@@ -4,23 +4,21 @@ require_once 'connect_db.inc.php';
 $member_id = -1;
 $member_name = "Somebody I Don't Know";
 $need_identification = true;
-if (!isset($_COOKIE['scram_team_member_name']))
+if (isset( $_GET['member_name']))
 {
-	if (isset( $_GET['member_name']))
-	{
-			setcookie( 'scram_team_member_name', $_GET['member_name']);
-			$member_name = $_GET['member_name'];
-			$need_identification = false;
-	}
+	setcookie( 'scram_team_member_name', $_GET['member_name']);
+	$member_name = $_GET['member_name'];
+	$need_identification = false;
 }
-else
+
+if ($need_identification && isset($_COOKIE['scram_team_member_name']))
 {
 	$member_name = $_COOKIE['scram_team_member_name'];
 	$need_identification = false;
 }
 
-$member_name = $database->escape($member_name);
-$member = $database->get_single_result( "select resource_id from resource where name = '$member_name'");
+$member_name_db = $database->escape($member_name);
+$member = $database->get_single_result( "select resource_id from resource where name = '$member_name_db'");
 $member_id = $member['resource_id'];
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN">
