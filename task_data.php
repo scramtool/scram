@@ -70,18 +70,60 @@ function make_global( &$input, $names)
 	}
 }
 
+function print_single_task( $task_id)
+{
+	global $database;
+	$task_info = $database->get_single_result( get_task_query( 0, $task_id));
+	print json_encode($task_info);
+	
+}
+
+function handle_report( $task_id, $estimate, $spent)
+{
+	global $database;
+	$success = $database->exec("INSERT INTO report(task_id, resource_id, date, burnt, estimate) SELECT $task_id, resource_id, NOW(), $spent, $estimate FROM task WHERE task_id = $task_id");
+	if ($success)
+	{
+		print_single_task( $task_id);
+	}
+}
+
+function handle_move( $task_id, $status, $owner)
+{
+	global $database;
+	$task_id = $database->escape($task_id);
+	$status = $database->escape( $status);
+	
+	if (isset( $owner))
+	{
+		$owner = $database-escapeshellarg($owner);
+		$owner_update = ", resource_id = $owner";
+	}
+	else {
+		$owner_update = '';
+	}
+	
+	$query = "UPDATE task SET status='$status' $owner_update WHERE task_id = $task_id";
+	$success = $database->exec($query);
+	if ($success)
+	{
+		print_single_task($task_id);
+	}
+	
+}
+
 if (isset($_GET['action']))
 {
 	$action = $_GET['action'];
 	if ($action == 'report')
 	{
 		make_global( $_GET, Array('task_id', 'estimate', 'spent'));
-		$success = $database->exec("INSERT INTO report(task_id, resource_id, date, burnt, estimate) SELECT $task_id, resource_id, NOW(), $spent, $estimate FROM task WHERE task_id = $task_id");
-		if ($success)
-		{
-			$task_info = $database->get_single_result( get_task_query( 0, $task_id));
-			print json_encode($task_info);	
-		}
+		handle_report($task_id, $estimate, $spent);
+	}
+	elseif ( $action == 'move')
+	{
+		make_global( $_GET, Array('task_id', 'status', 'owner'));
+		handle_move( $task_id, $status, $owner);
 	}
 	
 }

@@ -46,6 +46,12 @@ class odbc_wrapper  extends database_wrapper
 	{
 		return odbc_field_name($query_result, $field_number);
 	}
+	
+	function last_inserted_id()
+	{
+		$fields = $this->get_single_result("SELECT LAST_INSERT_ID() AS id");
+		return $fields['id'];
+	}
 
 	/**
 	 * Lock the given tables. For ODBC connections this is mapped onto a connection.

@@ -39,6 +39,11 @@ class mysql_wrapper  extends database_wrapper
 		return $result;
 	}
 
+	function last_inserted_id()
+	{
+		return mysql_insert_id( $this->connection);
+	}
+	
 	function num_rows( $query_result)
 	{
 		return mysql_num_rows($query_result);
