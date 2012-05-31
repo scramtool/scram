@@ -97,6 +97,16 @@ class odbc_wrapper  extends database_wrapper
 		return addslashes($string);
 	}
 	
+	/**
+	* Create a query text that will add a number of days to a date.
+	* @return string
+	*/
+	function TxtAddDaysToDate( $date, $days)
+	{
+		return "(DATEADD(day,$days, $date))";
+	}
+		
+	
 	var $connection;
 }
 ?>

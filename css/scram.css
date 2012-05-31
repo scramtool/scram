@@ -27,7 +27,6 @@ body {
 .taskNumbers
 {
 	background: none repeat scroll 0 0 #DDCC00;
-	border-radius: 3px 3px 0px 0px;
 	text-align: center; 
 	font-size: 120%;
 	overflow: hidden;
@@ -40,14 +39,15 @@ body {
 
 .yellowNote
 {
-	border-radius: 3px;
+	border-radius: 0px 0px 6px 0px;
 	background-color: #eeee00;
 	border: 1px solid #CCCC00;
+	box-shadow: 3px 3px 10px #cccccc;
 	padding: 0 px;
 	margin: 3px; 
 	float: left; 
-	width: 200px; 
-	height: 90px; 
+	width: 180px; 
+	height: 100px; 
 }
 
 .estimate, .submitReportButton

@@ -128,6 +128,16 @@ class mysql_wrapper  extends database_wrapper
 		return mysql_real_escape_string($string);
 	}
 	
+	
+	/**
+	 * Create a query text that will add a number of days to a date. 
+	 * @return string
+	 */
+	function TxtAddDaysToDate( $date, $days)
+	{
+		return "(($date) + INTERVAL ($days) DAY)";
+	}
+	
 	var $connection;
 }
 ?>
