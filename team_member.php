@@ -36,9 +36,9 @@ var member_id = <?=$member_id?>;
 var member_name = '<?=$member_name?>';
 var need_identification = <?=$need_identification?1:0?>;
 var sprint_id = 1;
-var tasks = new Array();
+//var tasks = new Array();
 $(document).ready(function() {
-	loadTasks( sprint_id);
+	loadTasks( sprint_id, refreshTaskUi);
 	});
 </script>
 <title>Task overview for <?=$member_name?></title>
