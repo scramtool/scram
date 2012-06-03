@@ -1,0 +1,46 @@
+@CHARSET "UTF-8";
+
+/* Header styles */
+header {
+    clear:both;
+    float:left;
+    width:100%;
+}
+
+/* column container */
+.colmask {
+	position:relative;		/* This fixes the IE7 overflow hidden bug and stops the layout jumping out of place */
+    clear:both;
+    float:left;
+       width:100%;			/* width of whole page */
+	overflow:hidden;	/* This chops off any overhanging divs */
+}
+.leftmenu {
+    background:#F4F4F4;
+}
+.leftmenu .colright {
+       float:left;
+       width:200%;
+       position:relative;
+       left:12em;
+       background:#fff;
+}
+.leftmenu .col1wrap {
+    float:right;
+    width:50%;
+    position:relative;
+    right:12em;
+    padding-bottom:1em;
+}
+.leftmenu .mainColumn {
+       margin:0 1em 0 13em;
+    position:relative;
+    right:100%;
+    overflow:hidden;
+}
+.leftmenu .menuColumn {
+       float:left;
+       width:10em;
+       position:relative;
+       right:11em;
+}

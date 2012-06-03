@@ -25,14 +25,25 @@ $member_id = $member['resource_id'];
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
 <link href="css/smoothness/jquery-ui-1.8.20.custom.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="scripts/jquery-1.7.2.min.js"/></script>
+<script type="text/javascript" src="scripts/jquery-ui-1.8.20.custom.min.js"/></script>
+<script type="text/javascript" src="scripts/jquery.jeditable.mini.js"/></script>
+
+<link href="css/holygrail.css" rel="stylesheet" type="text/css"/>
 <link href="css/scram.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="scripts/scram.js"></script>
+
 <script type="text/javascript">
 var member_id = <?=$member_id?>;
 var member_name = '<?=$member_name?>';
 var need_identification = <?=$need_identification?1:0?>;
 var sprint_id = 1;
+$(document).ready(function() {
+	loadTasks( sprint_id, refreshSprintTasks);
+	});
+
 </script>
 
 <title>Sprint details</title>
@@ -46,21 +57,27 @@ var sprint_id = 1;
 </head>
 
 <body>
-<div id="menu">
-<h2>Menu</h2>
-<ul>
-<li>sprint overview
-<li><a href="team_member.php" >team member page</a>
-</ul>
-</div>
-<div class="mainBody" id="tasks">    
-    <h3 class="categoryHeader"><a href="#">Sprint Details</a></h3>
-    <div class="categoryContent"><ul id="sprintDetails" class="taskList"></ul><br style="clear:both;"/></div>
-    <h3 class="categoryHeader"><a href="#">Sprint People</a></h3>
-    <div class="categoryContent"><ul id="sprintPeople" class="taskList"></ul><br style="clear:both;"/></div>
-    <h3 class="categoryHeader"><a href="#">Sprint Tasks</a><button class="addTaskButton">Add a task</button></h3>
-    <div class="categoryContent"><div id="taskList"></div><br style="clear:both;"/></div>
-</div>
 
+<div class="colmask leftmenu">
+    <div class="colright">
+        <div class="col1wrap">
+			<div class="mainColumn" id="tasks">    
+			    <h3 class="categoryHeader"><a href="#">Sprint Details</a></h3>
+			    <div class="categoryContent"><ul id="sprintDetails" class="taskList"></ul><br style="clear:both;"/></div>
+			    <h3 class="categoryHeader"><a href="#">Sprint People</a></h3>
+			    <div class="categoryContent"><ul id="sprintPeople" class="taskList"></ul><br style="clear:both;"/></div>
+			    <h3 class="categoryHeader"><a href="#">Sprint Tasks</a><button class="addTaskButton">Add a task</button></h3>
+			    <div class="categoryContent"><div id="sprintTasks"></div><br style="clear:both;"/></div>
+			</div>
+		</div>
+		<div id="menu" class= "menuColumn">
+			<h2>Menu</h2>
+			<ul>
+			<li>sprint overview
+			<li><a href="team_member.php" >team member page</a>
+			</ul>
+		</div>		
+	</div>
+</div>
 </body>
 </html>
