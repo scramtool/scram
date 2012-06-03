@@ -32,6 +32,11 @@ body {
 	overflow: hidden;
 }
 
+.taskNumbers form
+{
+	margin: 2px 0px 2px 0px;
+}
+
 .taskNumbers div
 {
 	float:left;

@@ -15,14 +15,14 @@ var currentTasks = new Array();
  * Load all tasks of a particular sprint, fill the global array currentTasks and refresh the UI.
  * @param sprint numerical id of the sprint for which to load all tasks
  */
-function loadTasks( sprint) {
+function loadTasks( sprint, callback) {
 	$.getJSON( taskListUrl + '?sprint_id=' + sprint, 
 			function( tasklist) {
 				currentTasks = new Array();
 				$.each( tasklist, function( index, task){
 					currentTasks['x' + task.task_id] = task;
 				});
-				refreshTaskUi();
+				callback();
 			});
 }
 
@@ -57,6 +57,11 @@ function submitText( value, settings)
      return '<img class="centered" src="images/ajax-loader.gif"/>';
 }
 
+/**
+ * Take a task details item and make it editable.
+ * @param index
+ * @param value
+ */
 function makeEditable( index, value)
 {
 	task_id = $(value).attr('id').substring(16);
@@ -72,6 +77,9 @@ function makeEditable( index, value)
     });
 }
 
+/**
+ * This function updates the ui of the team_member page after a task reload.
+ */
 function refreshTaskUi()
 {
 	// clear all scrumboards
@@ -81,22 +89,66 @@ function refreshTaskUi()
 	for (var task_key in currentTasks)
 	{
 		var task = currentTasks[task_key];
-		item = $('<li/>', {'class': 'taskNote', 'id':'container-for-' + task.task_id, 'html':makeTaskMarkup( task, worksOnTask( member_id, task))});
 		if (worksOnTask( member_id, task))
 		{
-			item.appendTo("#myTasks");
+			addTaskToList(task, "#myTasks");
 		}
 		else
 		{
 			list = '#' + task.status + 'List';
-			item.appendTo( list);
+			addTaskToList(task, list);
 		}
 	}
+	
+	// TODO: figure out how to deal with jqui buttons after refresh.
+	// putting it here looks like an ugly hack. Which it is, of course.
 	$(".submitReportButton").button( {icons: {primary: "ui-icon-gear"}, text:false}).click( submitEstimate);
 	$(".taskList").sortable({'connectWith':'.taskList', receive: noteReceived});
 	$('.taskDetails').each( makeEditable); 
 }
 
+/**
+ * Add the given task to an HTML <ul> element.
+ * @param task
+ * @param listName
+ */
+function addTaskToList( task, listName)
+{
+	item = 
+		$('<li/>', 
+			{
+				'class': 'taskNote', 
+				'id':'container-for-' + task.task_id, 
+				'html':makeTaskMarkup( task, worksOnTask( member_id, task))
+			}
+		);
+	item.appendTo( listName);
+}
+
+/**
+ * This function refreshes the task list of the sprint overview page after a reload of 
+ * the tasks.
+ */
+function refreshSprintTasks()
+{
+	// clear all scrumboards
+	$("#sprintTasks").html("");
+	
+	// now send the tasks to their appropriate scrumboard.
+	for (var task_key in currentTasks)
+	{
+		addTaskToList( currentTasks[task_key], "#sprintTasks");
+	}
+	$('.taskDetails').each( makeEditable);
+	$(".submitReportButton").button( {icons: {primary: "ui-icon-gear"}, text:false}).click( submitEstimate);
+}
+
+/**
+ * This function is called when a task list (a <ul>-element) receives a note from another
+ * task list through a drag-n-drop operation.
+ * @param event
+ * @param ui
+ */
 function noteReceived( event, ui)
 {
 	task_id = $(ui.item).attr("id").replace('container-for-','');
@@ -135,7 +187,7 @@ function noteReceived( event, ui)
 }
 
 /**
- * Does the developer with the given resourceId currently work on the given task?
+ * Does the person with the given resourceId currently work on the given task?
  * @param resourceId
  * @param taskInfo
  * @returns {Boolean}
@@ -171,11 +223,13 @@ function makeTaskMarkup( task, isInWorkList)
 	return html;
 }
 
-function makeWaitMarkup()
-{
-	html = '<div class="yellowNote"><div class="taskNumbers">Please wait</div><div class="taskDetails"><img class="centered" src="images/ajax-loader.gif"/></div></div>';
-}
 
+/**
+ * Determine whether two DateTimes are on the same day. 
+ * @param date1
+ * @param date2
+ * @returns {Boolean}
+ */
 function isOnSameDay( date1, date2)
 {
 	return 	date1.getFullYear() == date2.getFullYear()
