@@ -53,18 +53,18 @@ $(document).ready(function() {
 </ul>
 </div>
 <div class="mainBody" id="tasks">
-    <h3 class="taskCategoryHeader"><a href="#">My Tasks</a></h3>
-    <div class="scrumBoardTasks"><ul id="myTasks" class="taskList"></ul><br style="clear:both;"/></div>
-    <h3 class="taskCategoryHeader"><a href="#">To Do</a></h3>
-    <div class="scrumBoardTasks"><ul id="toDoList" class="taskList"></ul><br style="clear:both;"/></div>
-    <h3 class="taskCategoryHeader"><a href="#">In Progress</a></h3>
-    <div class="scrumBoardTasks"><ul id="inProgressList" class="taskList"></ul><br style="clear:both;"/></div>
-    <h3 class="taskCategoryHeader"><a href="#">To be Verified</a></h3>
-    <div class="scrumBoardTasks"><ul id="toBeVerifiedList" class="taskList"></ul><br style="clear:both;"/></div>
-    <h3 class="taskCategoryHeader"><a href="#">Done</a></h3>
-    <div class="scrumBoardTasks"><ul id="doneList" class="taskList"></ul><br style="clear:both;"/></div>
-    <h3 class="taskCategoryHeader"><a href="#">Forwarded</a></h3>
-    <div class="scrumBoardTasks forwardedTasks"><ul id="forwardedList" class="taskList"></ul><br style="clear:both;"/></div>
+    <h3 class="categoryHeader"><a href="#">My Tasks</a></h3>
+    <div class="categoryContent"><ul id="myTasks" class="taskList"></ul><br style="clear:both;"/></div>
+    <h3 class="categoryHeader"><a href="#">To Do</a></h3>
+    <div class="categoryContent"><ul id="toDoList" class="taskList"></ul><br style="clear:both;"/></div>
+    <h3 class="categoryHeader"><a href="#">In Progress</a></h3>
+    <div class="categoryContent"><ul id="inProgressList" class="taskList"></ul><br style="clear:both;"/></div>
+    <h3 class="categoryHeader"><a href="#">To be Verified</a></h3>
+    <div class="categoryContent"><ul id="toBeVerifiedList" class="taskList"></ul><br style="clear:both;"/></div>
+    <h3 class="categoryHeader"><a href="#">Done</a></h3>
+    <div class="categoryContent"><ul id="doneList" class="taskList"></ul><br style="clear:both;"/></div>
+    <h3 class="categoryHeader"><a href="#">Forwarded</a></h3>
+    <div class="categoryContent forwardedTasks"><ul id="forwardedList" class="taskList"></ul><br style="clear:both;"/></div>
 </div>
 </body>
 </html>
