@@ -25,18 +25,7 @@ $member_id = $member['resource_id'];
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
-<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.9.0/build/fonts/fonts-min.css" />
-<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.9.0/build/calendar/assets/skins/sam/calendar.css" />
-<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.9.0/build/datatable/assets/skins/sam/datatable.css" />
-<script type="text/javascript" src="http://yui.yahooapis.com/2.9.0/build/yahoo-dom-event/yahoo-dom-event.js"></script>
-<script type="text/javascript" src="http://yui.yahooapis.com/2.9.0/build/calendar/calendar-min.js"></script>
-<script type="text/javascript" src="http://yui.yahooapis.com/2.9.0/build/element/element-min.js"></script>
-<script type="text/javascript" src="http://yui.yahooapis.com/2.9.0/build/datasource/datasource-min.js"></script>
-<script type="text/javascript" src="http://yui.yahooapis.com/2.9.0/build/event-delegate/event-delegate-min.js"></script>
-
-<script type="text/javascript" src="http://yui.yahooapis.com/2.9.0/build/datatable/datatable-min.js"></script>
-<script type="text/javascript" src="http://yui.yahooapis.com/2.9.0/build/datatable/datatable.js"></script>
+<script src="http://yui.yahooapis.com/3.5.1/build/yui/yui-min.js"></script>
 <link href="css/smoothness/jquery-ui-1.8.20.custom.css" rel="stylesheet" type="text/css"/>
 <link href="css/scram.css" rel="stylesheet" type="text/css"/>
 <script src="http://yui.yahooapis.com/3.5.1/build/yui/yui-min.js"></script>
@@ -46,7 +35,7 @@ var member_id = <?=$member_id?>;
 var member_name = '<?=$member_name?>';
 var need_identification = <?=$need_identification?1:0?>;
 var sprint_id = 1;
-YAHOO.example.Data = {
+ExampleData = {
 	    addresses: [
 	        {name:"John A. Smith", address:"1236 Some Street", city:"San Francisco", state:"CA", amount:5, active:"yes", colors:["red"], fruit:["banana","cherry"], last_login:"4/19/2007"},
 	        {name:"Joan B. Jones", address:"3271 Another Ave", city:"New York", state:"NY", amount:3, active:"no", colors:["red","blue"], fruit:["apple"], last_login:"2/15/2006"},
@@ -69,8 +58,11 @@ YAHOO.example.Data = {
 	    ]
 	};
 
-YAHOO.util.Event.addListener(window, "load", function() {
-    YAHOO.example.InlineCellEditing = function() {
+YUI().use('event', 'yui2-dragdrop', 'yui2-datatable', function (Y) {
+
+    var YAHOO = Y.YUI2;
+
+    Y.on("available", function() {
         // Custom formatter for "address" column to preserve line breaks
         var formatAddress = function(elCell, oRecord, oColumn, oData) {
             elCell.innerHTML = "<pre class=\"address\">" + oData + "</pre>";
@@ -80,7 +72,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
             {key:"uneditable"},
             {key:"address", formatter:formatAddress, editor: new YAHOO.widget.TextareaCellEditor()},
             {key:"city", editor: new YAHOO.widget.TextboxCellEditor({disableBtns:true})},
-            {key:"state", editor: new YAHOO.widget.DropdownCellEditor({dropdownOptions:YAHOO.example.Data.stateAbbrs,disableBtns:true})},
+            {key:"state", editor: new YAHOO.widget.DropdownCellEditor({dropdownOptions:["apple","banana","cherry"],disableBtns:true})},
             {key:"amount", editor: new YAHOO.widget.TextboxCellEditor({validator:YAHOO.widget.DataTable.validateNumber})},
             {key:"active", editor: new YAHOO.widget.RadioCellEditor({radioOptions:["yes","no","maybe"],disableBtns:true})},
             {key:"colors", editor: new YAHOO.widget.CheckboxCellEditor({checkboxOptions:["red","yellow","blue"]})},
@@ -88,7 +80,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
             {key:"last_login", formatter:YAHOO.widget.DataTable.formatDate, editor: new YAHOO.widget.DateCellEditor()}
         ];
 
-        var myDataSource = new YAHOO.util.DataSource(YAHOO.example.Data.addresses);
+        var myDataSource = new YAHOO.util.DataSource(ExampleData.addresses);
         myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSARRAY;
         myDataSource.responseSchema = {
             fields: ["address","city","state","amount","active","colors","fruit",{key:"last_login",parser:"date"}]
@@ -112,7 +104,7 @@ YAHOO.util.Event.addListener(window, "load", function() {
             oDS: myDataSource,
             oDT: myDataTable
         };
-    }();
+    }, "#taskList");
 });
 </script>
 
