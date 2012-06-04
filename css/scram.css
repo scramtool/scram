@@ -55,6 +55,19 @@ body {
 	height: 100px; 
 }
 
+.purpleNote
+{
+	border-radius: 0px 0px 6px 0px;
+	background-color: #ee00ff;
+	border: 1px solid #CC00cc;
+	box-shadow: 3px 3px 10px #cccccc;
+	padding: 4px;
+	margin: 3px; 
+	float: left; 
+	width: 180px; 
+	height: 30px; 
+}
+
 .estimate, .submitReportButton
 {
 	vertical-align: middle;
@@ -98,6 +111,20 @@ border-color:#888888;
 border-width: 0px 1px 1px 1px;
 border-radius: 0 0 8px 8px;
 overflow: hidden;
+}
+
+.categoryTopLine
+{
+padding: 1px;
+border-style:solid;
+border-color:#888888;
+border-width: 0px 1px 1px 1px;
+overflow: hidden;
+}
+
+.categoryTopLine form
+{
+	margin: 4px;
 }
 
 .categoryContent li

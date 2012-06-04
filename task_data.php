@@ -1,5 +1,6 @@
 <?php
 require_once 'connect_db.inc.php';
+require_once 'utilities.inc.php';
 
 class Task
 {
@@ -60,16 +61,6 @@ function print_task_data( $sprint_id)
 	print json_encode($tasks);
 }
 
-function make_global( &$input, $names)
-{
-	foreach ($names as $name) {
-		if (isset( $input[$name]))
-		{
-			$GLOBALS[$name] =  $input[$name];
-		}
-	}
-}
-
 function print_single_task( $task_id)
 {
 	global $database;
@@ -112,6 +103,44 @@ function handle_move( $task_id, $status, $owner)
 	
 }
 
+/**
+ * Handle an 'add' request.
+ * 
+ * This will insert a new task entry in the database and if an estimate was provided, a report of this will be inserted as well.
+ * placeholder is a client-provided value that refers to some placeholder that the client will have used locally for a dummy task.
+ * This placeholder will be returned verbatim to the cliend after inserting.
+ * 
+ * @param unknown_type $description
+ * @param unknown_type $estimate
+ * @param unknown_type $sprint_id
+ * @param unknown_type $placeholder
+ */
+function handle_add( $description, $estimate, $sprint_id, $placeholder)
+{
+	global $database;
+	
+	$description = $database->escape($description);
+	$estimate	 = $database->escape($estimate);
+	$sprint_id 	 = $database->escape($sprint_id);
+	
+	// insert a task into the database. A task id will be created automatically, so we need to retreive that.
+	$database->exec("INSERT INTO task(sprint_id, description) VALUES ( $sprint_id, '$description')");
+	$id = $database->last_inserted_id();
+	
+	if (isset($estimate))
+	{
+		// insert a new report. By default, the date of the report will be today.
+		$database->exec("INSERT INTO report( task_id, resource_id, burnt, estimate) VALUES( $id, 0, 0, $estimate)");
+	}
+	
+	$task_info = $database->get_single_result( get_task_query( 0, $id));
+	$task_info['placeholder'] = $placeholder;
+	
+	print json_encode($task_info);
+}
+
+
+// START OF SCRIPT
 if (isset($_GET['action']))
 {
 	$action = $_GET['action'];
@@ -125,6 +154,11 @@ if (isset($_GET['action']))
 		make_global( $_GET, Array('task_id', 'status', 'owner'));
 		handle_move( $task_id, $status, $owner);
 	}
+	elseif ($action == 'add')
+	{
+		make_global( $_GET, Array('estimate', 'description', 'placeholder', 'sprint_id'));
+		handle_add( $description, $estimate, $sprint_id, $placeholder);
+	}
 	
 }
 else 
@@ -132,6 +166,6 @@ else
 	if (isset( $_GET['sprint_id']))
 	{
 		$sprint_id = $_GET['sprint_id'];
-		print_task_data($sprint_id);
+		print_task_data( $sprint_id);
 	}
 }

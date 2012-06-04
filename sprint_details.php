@@ -6,7 +6,7 @@ $member_name = "Somebody I Don't Know";
 $need_identification = true;
 if (isset( $_GET['member_name']))
 {
-	setcookie( 'scram_team_member_name', $_GET['member_name']);
+	setcookie( 'scram_team_member_name', $_GET['member_name'], time()+60*60*24*365);
 	$member_name = $_GET['member_name'];
 	$need_identification = false;
 }
@@ -30,6 +30,7 @@ $member_id = $member['resource_id'];
 <script type="text/javascript" src="scripts/jquery-1.7.2.min.js"/></script>
 <script type="text/javascript" src="scripts/jquery-ui-1.8.20.custom.min.js"/></script>
 <script type="text/javascript" src="scripts/jquery.jeditable.mini.js"/></script>
+<script type="text/javascript" src="scripts/jquery.numeric.js"/></script>
 
 <link href="css/holygrail.css" rel="stylesheet" type="text/css"/>
 <link href="css/scram.css" rel="stylesheet" type="text/css"/>
@@ -42,6 +43,11 @@ var need_identification = <?=$need_identification?1:0?>;
 var sprint_id = 1;
 $(document).ready(function() {
 	loadTasks( sprint_id, refreshSprintTasks);
+	loadPeople( sprint_id, refreshSprintPeople);
+	loadSprintDetails( sprint_id, refreshSprintDetails);
+	$(".newTaskButton").button( {icons: {primary: "ui-icon-plus"}, text:false}).click( submitNewTask);
+	$(".firstToFocus").focus();
+	$(".positive-integer").numeric({ decimal: false, negative: false }, function() { alert("Positive integers only"); this.value = ""; this.focus(); });
 	});
 
 </script>
@@ -66,7 +72,15 @@ $(document).ready(function() {
 			    <div class="categoryContent"><ul id="sprintDetails" class="taskList"></ul><br style="clear:both;"/></div>
 			    <h3 class="categoryHeader"><a href="#">Sprint People</a></h3>
 			    <div class="categoryContent"><ul id="sprintPeople" class="taskList"></ul><br style="clear:both;"/></div>
-			    <h3 class="categoryHeader"><a href="#">Sprint Tasks</a><button class="addTaskButton">Add a task</button></h3>
+			    <h3 class="categoryHeader"><a href="#">Sprint Tasks</a></h3>
+			    <div class="categoryTopLine">
+			    	<form>
+			    		New task: 
+			    		<label for="description">Description:&nbsp;</label><input type="text" name="description" id="description" class="firstToFocus" />
+			    		<label for="estimate">Initial estimate:&nbsp;</label><input type="text" name="estimate" id="estimate" class="estimate positive-integer"/>
+			    		<button class="newTaskButton">Submit a new task</button>
+			    	</form>
+			    </div>
 			    <div class="categoryContent"><div id="sprintTasks"></div><br style="clear:both;"/></div>
 			</div>
 		</div>

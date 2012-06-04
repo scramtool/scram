@@ -2,7 +2,11 @@
  * 
  */
 var taskListUrl = 'task_data.php';
+var peopleListUrl = 'people_data.php';
 var changeTextUrl = 'change_task_text.php';
+var sprintDetailsUrl = 'sprint_data.php';
+
+var placeholderCounter = 0;
 
 /**
  * An associative container that holds task_id->task pairs.
@@ -24,6 +28,74 @@ function loadTasks( sprint, callback) {
 				});
 				callback();
 			});
+}
+
+function loadPeople( sprint, callback)
+{
+	$.getJSON( peopleListUrl + '?sprint_id=' + sprint, 
+			function( peopleList) {
+				currentPeople = new Array();
+				$.each( peopleList, function( index, resource){
+					currentPeople['x' + resource.resource_id] = resource;
+				});
+				callback();
+			});	
+}
+
+function loadSprintDetails( sprint, callback)
+{
+	$.getJSON( sprintDetailsUrl + '?action=get&sprint_id=' + sprint, callback);	
+}
+
+function refreshSprintDetails( sprint)
+{
+	$("#sprintDetails").html( "<h2>" + sprint.description + "</h2>Start date:" + sprint.start_date + " End date: " + sprint.end_date);
+}
+
+function submitNewTask()
+{
+	var query = "";
+	var placeholderid = ++placeholderCounter;
+	
+	task = new Array();
+	$(this).parent().children("input").each( 
+			function(index, element) {
+				value =  encodeURIComponent( element.value);
+				name = element.name;
+				query += '&' + name + "=" + value;
+				task[name] = element.value;
+				});
+	
+	if (!task.estimate) task.estimate = 8;
+	if (task.description.length != 0)
+	{
+		query += '&placeholder=' + placeholderid;
+		query += '&sprint_id=' + sprint_id;
+		
+		task.name = "Nobody";
+		item = 
+			$('<li/>', 
+				{
+					'class': 'taskNote', 
+					'id':'container-for-task-stub-' + placeholderid, 
+					'html':makeTaskPlaceholder(task)
+				}
+			);
+		item.prependTo( '#sprintTasks');
+	
+		$.getJSON( taskListUrl + '?action=add' + query,
+				function (task)
+				{
+					currentTasks['x'+task.task_id] = task;
+					$("#container-for-task-stub-" + task.placeholder).replaceWith( createTaskListItem( task));
+				});
+	}
+	// clear the form and bring the cursor to the first input.
+	$('.categoryTopLine form input').val("");
+	$('.categoryTopLine form #estimate').val("8");
+	$('.firstToFocus').focus();
+	
+	return false;
 }
 
 /**
@@ -105,6 +177,64 @@ function refreshTaskUi()
 	$(".submitReportButton").button( {icons: {primary: "ui-icon-gear"}, text:false}).click( submitEstimate);
 	$(".taskList").sortable({'connectWith':'.taskList', receive: noteReceived});
 	$('.taskDetails').each( makeEditable); 
+	$(".positive-integer").numeric({ decimal: false, negative: false }, function() { alert("Positive integers only"); this.value = ""; this.focus(); });
+}
+
+function addPersonToList( person, listName)
+{
+	item = 
+		$('<li/>', 
+			{
+				'class': 'personNote', 
+				'id':'container-for-person-' + person.resource_id, 
+				'html':makePersonMarkup( person)
+			}
+		);
+	item.appendTo( listName);
+}
+
+/**
+ * Create the html markup for display of a task.
+ * @param task The task to display
+ * @param isInWorkList Whether the task is displayed in the current work list.
+ * @returns
+ */
+function makeTaskMarkup( task, isInWorkList)
+{
+	if (!isInWorkList || isOnSameDay( new Date(task.report_date), new Date()))
+	{
+		reported_time = '<div class="clickable estimate frozen">' + task.estimate + '</div><div>&nbsp;&nbsp;&nbsp;</div><div>' + task.name+ '</div>';
+	}
+	else
+	{
+		reported_time = 
+			'<form>'+
+			' <input type="hidden" class="holdsTaskId" name="task_id" value="' + task.task_id + '"/>' +
+			' <label for="estimate">left:</label><input type="text"  id="estimate" name="estimate" class="estimate positive-integer" value="' + task.estimate + '"/>'+
+			' <label for="spent">spent:</label><input type="text" id="spent" name="spent" class="estimate positive-integer" value="0"/>'+
+			' <button class="submitReportButton">Submit Todays numbers</button>'+
+			'</form>';
+	}
+	html = '<div class="yellowNote"><div class="taskNumbers">'+ reported_time + '</div><div id="description-for-' + task.task_id + '" class="taskDetails">'+ task.description  +'</div></div>';
+	return html;
+}
+
+/**
+ * create a placeholder for a newly added task.
+ * This placeholder will be shown in the UI while the add-request is sent to the server.
+ * @param task
+ * @returns
+ */
+function makeTaskPlaceholder( task)
+{
+	reported_time = '<div class="clickable estimate frozen">' + task.estimate + '</div><div>&nbsp;&nbsp;&nbsp;</div><div>' + task.name+ '&nbsp;<img class="centered" src="images/ajax-loader.gif"/></div>';
+	html = '<div class="yellowNote"><div class="taskNumbers">'+ reported_time + '</div><div id="description-for-' + task.task_id + '" class="taskDetails">'+ task.description  +'</div></div>';
+	return html;
+}
+
+function makePersonMarkup( person, listName)
+{
+	return '<div class="purpleNote">' + person.name + '</div>';
 }
 
 /**
@@ -114,15 +244,19 @@ function refreshTaskUi()
  */
 function addTaskToList( task, listName)
 {
-	item = 
-		$('<li/>', 
+	item = createTaskListItem( task);
+	item.appendTo( listName);
+}
+
+function createTaskListItem( task)
+{
+	return $('<li/>', 
 			{
 				'class': 'taskNote', 
 				'id':'container-for-' + task.task_id, 
 				'html':makeTaskMarkup( task, worksOnTask( member_id, task))
 			}
 		);
-	item.appendTo( listName);
 }
 
 /**
@@ -141,6 +275,21 @@ function refreshSprintTasks()
 	}
 	$('.taskDetails').each( makeEditable);
 	$(".submitReportButton").button( {icons: {primary: "ui-icon-gear"}, text:false}).click( submitEstimate);
+}
+
+function refreshSprintPeople()
+{
+	// clear all scrumboards
+	$("#sprintPeople").html("");
+	
+	// now send the tasks to their appropriate scrumboard.
+	for (var person_key in currentPeople)
+	{
+		addPersonToList( currentPeople[person_key], "#sprintPeople");
+	}
+	
+//	$(".submitReportButton").button( {icons: {primary: "ui-icon-gear"}, text:false}).click( submitEstimate);
+
 }
 
 /**
@@ -197,31 +346,7 @@ function worksOnTask( resourceId, taskInfo)
 	return taskInfo.resource_id == resourceId && taskInfo.status == 'inProgress';
 }
 
-/**
- * Create the html markup for display of a task.
- * @param task The task to display
- * @param isInWorkList Whether the task is displayed in the current work list.
- * @returns
- */
-function makeTaskMarkup( task, isInWorkList)
-{
-	if (!isInWorkList || isOnSameDay( new Date(task.report_date), new Date()))
-	{
-		reported_time = '<div class="clickable estimate frozen">' + task.estimate + '</div><div>&nbsp;&nbsp;&nbsp;</div><div>' + task.name+ '</div>';
-	}
-	else
-	{
-		reported_time = 
-			'<form>'+
-			' <input type="hidden" class="holdsTaskId" name="task_id" value="' + task.task_id + '"/>' +
-			' <label for="estimate">left:</label><input type="text"  id="estimate" name="estimate" class="estimate" value="' + task.estimate + '"/>'+
-			' <label for="spent">spent:</label><input type="text" id="spent" name="spent" class="estimate" value="0"/>'+
-			' <button class="submitReportButton">Submit Todays numbers</button>'+
-			'</form>';
-	}
-	html = '<div class="yellowNote"><div class="taskNumbers">'+ reported_time + '</div><div id="description-for-' + task.task_id + '" class="taskDetails">'+ task.description  +'</div></div>';
-	return html;
-}
+
 
 
 /**
