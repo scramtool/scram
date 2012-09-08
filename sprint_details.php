@@ -1,4 +1,4 @@
-<?php 
+<?php
 require_once 'connect_db.inc.php';
 
 $member_id = -1;
@@ -26,15 +26,17 @@ $member_id = $member['resource_id'];
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-<link href="css/smoothness/jquery-ui-1.8.20.custom.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="scripts/jquery-1.7.2.min.js"/></script>
-<script type="text/javascript" src="scripts/jquery-ui-1.8.20.custom.min.js"/></script>
-<script type="text/javascript" src="scripts/jquery.jeditable.mini.js"/></script>
-<script type="text/javascript" src="scripts/jquery.numeric.js"/></script>
-
-<link href="css/holygrail.css" rel="stylesheet" type="text/css"/>
-<link href="css/scram.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="scripts/jquery-1.7.2.min.js" ></script>
+<script type="text/javascript" src="scripts/jquery-ui-1.8.20.custom.min.js" ></script>
+<script type="text/javascript" src="scripts/jquery.jeditable.mini.js" ></script>
+<script type="text/javascript" src="scripts/jquery.numeric.js" ></script>
+<script type="text/javascript" src="scripts/raphael-min.js"></script>
+<script type="text/javascript" src="scripts/charts.min.js"></script>
 <script type="text/javascript" src="scripts/scram.js"></script>
+
+<link href="css/holygrail.css" rel="stylesheet" type="text/css" />
+<link href="css/scram.css" rel="stylesheet" type="text/css" />
+<link href="css/smoothness/jquery-ui-1.8.20.custom.css" rel="stylesheet" type="text/css" />
 
 <script type="text/javascript">
 var member_id = <?=$member_id?>;
@@ -42,56 +44,102 @@ var member_name = '<?=$member_name?>';
 var need_identification = <?=$need_identification?1:0?>;
 var sprint_id = 1;
 $(document).ready(function() {
+	$( "#tabs" ).tabs();
 	loadTasks( sprint_id, refreshSprintTasks);
 	loadPeople( sprint_id, refreshSprintPeople);
 	loadSprintDetails( sprint_id, refreshSprintDetails);
 	$(".newTaskButton").button( {icons: {primary: "ui-icon-plus"}, text:false}).click( submitNewTask);
 	$(".firstToFocus").focus();
-	$(".positive-integer").numeric({ decimal: false, negative: false }, function() { alert("Positive integers only"); this.value = ""; this.focus(); });
+	//$(".positive-integer").numeric({ decimal: false, negative: false }, function() { alert("Positive integers only"); this.value = ""; this.focus(); });
+
+	// Can pass in the id 
+	var chart = new Charts.LineChart('burndown', {show_grid: true});
+	var day1 = new Date(2012, 9, 1);
+	var day2 = new Date(2012, 9, 5);
+	var day3 = new Date(2012, 9, 20);
+	
+	chart.add_line({
+		  data: [[day1, 100],[day2, 200],[day3, 300]]
+		});
+	chart.draw();
 	});
 
 </script>
 
 <title>Sprint details</title>
-<link href="css/smoothness/jquery-ui-1.8.20.custom.css" rel="stylesheet" type="text/css"/>
-<link href="css/scram.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="scripts/jquery-1.7.2.min.js"/></script>
-<script type="text/javascript" src="scripts/jquery-ui-1.8.20.custom.min.js"/></script>
-<script type="text/javascript" src="scripts/jquery.jeditable.mini.js"/></script>
+<link href="css/smoothness/jquery-ui-1.8.20.custom.css" rel="stylesheet"
+	type="text/css" />
+<link href="css/scram.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="scripts/jquery-1.7.2.min.js" /></script>
+<script type="text/javascript"
+	src="scripts/jquery-ui-1.8.20.custom.min.js" /></script>
+<script type="text/javascript" src="scripts/jquery.jeditable.mini.js" /></script>
 <script type="text/javascript" src="scripts/scram.js"></script>
 
 </head>
 
 <body>
 
-<div class="colmask leftmenu">
-    <div class="colright">
-        <div class="col1wrap">
-			<div class="mainColumn" id="tasks">    
-			    <h3 class="categoryHeader"><a href="#">Sprint Details</a></h3>
-			    <div class="categoryContent"><ul id="sprintDetails" class="taskList"></ul><br style="clear:both;"/></div>
-			    <h3 class="categoryHeader"><a href="#">Sprint People</a></h3>
-			    <div class="categoryContent"><ul id="sprintPeople" class="taskList"></ul><br style="clear:both;"/></div>
-			    <h3 class="categoryHeader"><a href="#">Sprint Tasks</a></h3>
-			    <div class="categoryTopLine">
-			    	<form>
-			    		New task: 
-			    		<label for="description">Description:&nbsp;</label><input type="text" name="description" id="description" class="firstToFocus" />
-			    		<label for="estimate">Initial estimate:&nbsp;</label><input type="text" name="estimate" id="estimate" class="estimate positive-integer"/>
-			    		<button class="newTaskButton">Submit a new task</button>
-			    	</form>
-			    </div>
-			    <div class="categoryContent"><div id="sprintTasks"></div><br style="clear:both;"/></div>
+	<div class="colmask leftmenu">
+		<div class="colright">
+			<div class="col1wrap">
+				<div class="mainColumn" id="tasks">
+					<div id="tabs">
+						<ul>
+							<li><a href="#tabs-1">Details</a></li>
+							<li><a href="#tabs-2">Stats</a></li>
+						</ul>
+						<div id="tabs-1">
+							<h3 class="categoryHeader">
+								<a href="#">Sprint Details</a>
+							</h3>
+							<div class="categoryContent">
+								<ul id="sprintDetails" class="taskList"></ul>
+								<br style="clear: both;" />
+							</div>
+							<h3 class="categoryHeader">
+								<a href="#">Sprint People</a>
+							</h3>
+							<div class="categoryContent">
+								<ul id="sprintPeople" class="taskList"></ul>
+								<br style="clear: both;" />
+							</div>
+							<h3 class="categoryHeader">
+								<a href="#">Sprint Tasks</a>
+							</h3>
+							<div class="categoryTopLine">
+								<form>
+									New task: <label for="description">Description:&nbsp;</label><input
+										type="text" name="description" id="description"
+										class="firstToFocus" /> <label for="estimate">Initial
+										estimate:&nbsp;</label><input type="text" name="estimate"
+										id="estimate" class="estimate positive-integer" />
+									<button class="newTaskButton">Submit a new task</button>
+								</form>
+							</div>
+							<div class="categoryContent">
+								<div id="sprintTasks"></div>
+								<br style="clear: both;" />
+							</div>
+						</div>
+						<div id="tabs-2" >
+						<div id="graphwrapper">
+						<div id='burndown' style="height:600px;width:800px" ></div>
+						<div id="spacer" ></div>
+						<div id='burnup' ></div>
+						</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div id="menu" class="menuColumn">
+				<h2>Menu</h2>
+				<ul>
+					<li>sprint overview
+					<li><a href="team_member.php">team member page</a>
+				</ul>
 			</div>
 		</div>
-		<div id="menu" class= "menuColumn">
-			<h2>Menu</h2>
-			<ul>
-			<li>sprint overview
-			<li><a href="team_member.php" >team member page</a>
-			</ul>
-		</div>		
 	</div>
-</div>
 </body>
 </html>

@@ -1,4 +1,8 @@
 <?php
+/**
+ * obtain a user name.
+ * Other pages will redirect to this page if the user name is not known.
+ */
 if (isset( $_GET['member_name']))
 {
 	require_once 'connect_db.inc.php';
@@ -13,7 +17,6 @@ if (isset( $_GET['member_name']))
 }
 ?>
 <html>
-<head>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	
@@ -35,12 +38,14 @@ if (isset( $_GET['member_name']))
 	<link href="css/scram.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
+<h1>Tell me who you are</h1>
+To show you information that is important to you, I need to know who you are. Please give your name here.
 <div id="dialog-form" title="Create new user">
 <p class="validateTips">All form fields are required.</p>
-<form>
+<form method="get">
 <label for="name">Name</label>
 <input name="member_name" id="member_name" />
-<input type="submit"/>
+<input type="submit" value="Continue"/>
 </form>
 </div>
 </body>

@@ -5,7 +5,6 @@ var taskListUrl = 'task_data.php';
 var peopleListUrl = 'people_data.php';
 var changeTextUrl = 'change_task_text.php';
 var sprintDetailsUrl = 'sprint_data.php';
-
 var placeholderCounter = 0;
 
 /**
@@ -82,10 +81,10 @@ function submitNewTask()
 				}
 			);
 		item.prependTo( '#sprintTasks');
-	
 		$.getJSON( taskListUrl + '?action=add' + query,
 				function (task)
 				{
+					alert( task.toString());
 					currentTasks['x'+task.task_id] = task;
 					$("#container-for-task-stub-" + task.placeholder).replaceWith( createTaskListItem( task));
 				});

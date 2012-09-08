@@ -3,9 +3,9 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: May 23, 2012 at 02:11 AM
--- Server version: 5.5.22
--- PHP Version: 5.3.10-1ubuntu3.1
+-- Generation Time: Sep 08, 2012 at 01:26 AM
+-- Server version: 5.5.24
+-- PHP Version: 5.3.10-1ubuntu3.2
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS `resource` (
   `resource_id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,
   PRIMARY KEY (`resource_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
 
 -- --------------------------------------------------------
 
@@ -71,10 +71,11 @@ CREATE TABLE IF NOT EXISTS `task` (
   `task_id` int(11) NOT NULL AUTO_INCREMENT,
   `sprint_id` int(11) NOT NULL,
   `description` varchar(64) NOT NULL,
-  `status` enum('new','open','skipped','forwarded') NOT NULL DEFAULT 'new',
+  `status` enum('toDo','inProgress','toBeVerified','done','forwarded') NOT NULL DEFAULT 'toDo',
+  `resource_id` int(11) NOT NULL,
   PRIMARY KEY (`task_id`),
   KEY `sprint_id` (`sprint_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=32 ;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
