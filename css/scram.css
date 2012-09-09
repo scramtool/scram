@@ -19,6 +19,12 @@ body {
 	float:left;
 }
 
+.bigChart {
+    border-style: solid;
+    border-width: 1px;
+    border-color: black;
+}
+
 .categoryHeader
 {
 	background: url("smoothness/images/ui-bg_glass_75_e6e6e6_1x400.png") repeat-x scroll 50% 50% #0078AE;

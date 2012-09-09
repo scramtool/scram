@@ -48,10 +48,10 @@ var need_identification = <?=$need_identification?1:0?>;
 var sprint_id = 1;
 $(document).ready(function() {
 	$( "#tabs" ).tabs();
+	loadCharts( sprint_id);
 	loadTasks( sprint_id, refreshSprintTasks);
 	loadPeople( sprint_id, refreshSprintPeople);
 	loadSprintDetails( sprint_id, refreshSprintDetails);
-	drawBurnDown( 'burndown', sprint_id);
 	loadAvailability( sprint_id, function ( table) { createAvailabilityTable( 'tabs-3', table);});
 	$(".newTaskButton").button( {icons: {primary: "ui-icon-plus"}, text:false}).click( submitNewTask);
 	$(".firstToFocus").focus();
@@ -71,11 +71,17 @@ $(document).ready(function() {
 				<div class="mainColumn" id="tasks">
 					<div id="tabs">
 						<ul>
-							<li><a href="#tabs-1">Details</a></li>
-							<li><a href="#tabs-2">Stats</a></li>
+							<li><a href="#tabs-1">Stats</a></li>
+							<li><a href="#tabs-2">Details</a></li>
 							<li><a href="#tabs-3">Availability</a></li>
 						</ul>
-						<div id="tabs-1">
+						<div id="tabs-1" >
+						<div id="graphwrapper">
+						<div id='burndown' class="bigGraph" style="height:400px;width:540px" ><img class="centered" src="images/ajax-loader.gif"/></div>
+						<div id='burnup' class="bigGraph" style="height:400px;width:540px" ><img class="centered" src="images/ajax-loader.gif"/></div>
+						</div>
+						</div>
+						<div id="tabs-2">
 							<h3 class="categoryHeader">
 								<a href="#">Sprint Details</a>
 							</h3>
@@ -107,13 +113,6 @@ $(document).ready(function() {
 								<div id="sprintTasks"></div>
 								<br style="clear: both;" />
 							</div>
-						</div>
-						<div id="tabs-2" >
-						<div id="graphwrapper">
-						<div id='burndown' style="height:600px;width:800px" ></div>
-						<div id="spacer" ></div>
-						<div id='burnup' ></div>
-						</div>
 						</div>
 						<div id="tabs-3" style="overflow:scroll"></div>
 					</div>

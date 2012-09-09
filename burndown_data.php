@@ -83,8 +83,18 @@ function print_burndown_query( $sprint_id)
 	}
 }
 
+function print_chart_data( $sprint_id)
+{
+	global $database;
+	$database->get_result_table(get_burndown_query($sprint_id), $headers, $burndown);
+	$sprint = $database->get_single_result("select * from sprint where sprint_id = $sprint_id");
+	
+	print json_encode(array( 'burndown' => $burndown, 'sprint' => $sprint));
+}
+
 if (isset( $_GET['sprint_id']))
 {
 	$sprint_id = $_GET['sprint_id'];
-	print_burndown_query($sprint_id);
+	//print_burndown_query($sprint_id);
+	print_chart_data( $sprint_id);
 }

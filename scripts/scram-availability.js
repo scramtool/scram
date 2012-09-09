@@ -3,11 +3,22 @@ var getAvailabilityUrl = "availability.php";
 
 var times;
 
+/**
+ * Load availability data (the number of hours every engineer is available to the sprint each day) and 
+ * call the given callback when the data has arrived.
+ * @param sprint_id sprint for which the data must be obtained
+ * @param callback 
+ */
 function loadAvailability( sprint_id, callback)
 {
 	$.getJSON( getAvailabilityUrl + '?sprint_id=' + sprint_id, callback);
 }
 
+/**
+ * Create an array with the weekdays in the given sprint.
+ * @param sprint
+ * @returns [Date]
+ */
 function get_weekdays( sprint)
 {
 	result = new Array();
@@ -32,14 +43,13 @@ function formatDateHeader( date)
 	});
 	
 	return div;
-		
 }
 
 function createAvailabilityTable( element_id, data)
 {
 	times = data.times;
 	var table = $("<table style='availability' />");
-	var dates = get_weekdays( data.sprint);
+	var dates = getWeekdays( data.sprint);
 	var header = $("<tr></tr>");
 	$("<th>name</th>").appendTo( header);
 	$.each( dates, function (index, date){
