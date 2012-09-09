@@ -31,7 +31,7 @@ sub add_task( $$$)
 	my ($desc, $dev, $est) = @_;
 	$dev_id = get_dev( $dev);
 	$est = ceil( $est);
-	emit( "insert into task( task_id, sprint_id, description, status) values( $task_counter, 1, '$desc', 'toDo');");
+	emit( "insert into task( task_id, sprint_id, description, status, resource_id) values( $task_counter, 1, '$desc', 'toDo', $dev_id);");
 	$date_val = $plandate->strftime( '%F');
 	emit( "insert into report( task_id, resource_id, burnt, estimate, date) values( $task_counter, $dev_id, 0, $est, '$date_val');");
 	return $task_counter++;

@@ -8,6 +8,16 @@ body {
 	float:left;
 }
 
+.rotate270
+{
+	-webkit-transform: rotate(-90deg); 
+	-moz-transform: rotate(-90deg);
+	-o-transform: rotate(-90deg);
+	filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+	overflow:hidden;
+	display:block;
+	float:left;
+}
 
 .categoryHeader
 {
@@ -68,7 +78,7 @@ body {
 	height: 30px; 
 }
 
-.estimate, .submitReportButton
+.estimate, .submitReportButton, .dailyRation
 {
 	vertical-align: middle;
 	height: 24px;

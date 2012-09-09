@@ -33,6 +33,9 @@ $member_id = $member['resource_id'];
 <script type="text/javascript" src="scripts/raphael-min.js"></script>
 <script type="text/javascript" src="scripts/charts.min.js"></script>
 <script type="text/javascript" src="scripts/scram.js"></script>
+<script type="text/javascript" src="scripts/scram-charts.js"></script>
+<script type="text/javascript" src="scripts/scram-availability.js"></script>
+
 
 <link href="css/holygrail.css" rel="stylesheet" type="text/css" />
 <link href="css/scram.css" rel="stylesheet" type="text/css" />
@@ -48,33 +51,15 @@ $(document).ready(function() {
 	loadTasks( sprint_id, refreshSprintTasks);
 	loadPeople( sprint_id, refreshSprintPeople);
 	loadSprintDetails( sprint_id, refreshSprintDetails);
+	drawBurnDown( 'burndown', sprint_id);
+	loadAvailability( sprint_id, function ( table) { createAvailabilityTable( 'tabs-3', table);});
 	$(".newTaskButton").button( {icons: {primary: "ui-icon-plus"}, text:false}).click( submitNewTask);
 	$(".firstToFocus").focus();
-	//$(".positive-integer").numeric({ decimal: false, negative: false }, function() { alert("Positive integers only"); this.value = ""; this.focus(); });
-
-	// Can pass in the id 
-	var chart = new Charts.LineChart('burndown', {show_grid: true});
-	var day1 = new Date(2012, 9, 1);
-	var day2 = new Date(2012, 9, 5);
-	var day3 = new Date(2012, 9, 20);
-	
-	chart.add_line({
-		  data: [[day1, 100],[day2, 200],[day3, 300]]
-		});
-	chart.draw();
 	});
 
 </script>
 
 <title>Sprint details</title>
-<link href="css/smoothness/jquery-ui-1.8.20.custom.css" rel="stylesheet"
-	type="text/css" />
-<link href="css/scram.css" rel="stylesheet" type="text/css" />
-<script type="text/javascript" src="scripts/jquery-1.7.2.min.js" /></script>
-<script type="text/javascript"
-	src="scripts/jquery-ui-1.8.20.custom.min.js" /></script>
-<script type="text/javascript" src="scripts/jquery.jeditable.mini.js" /></script>
-<script type="text/javascript" src="scripts/scram.js"></script>
 
 </head>
 
@@ -88,6 +73,7 @@ $(document).ready(function() {
 						<ul>
 							<li><a href="#tabs-1">Details</a></li>
 							<li><a href="#tabs-2">Stats</a></li>
+							<li><a href="#tabs-3">Availability</a></li>
 						</ul>
 						<div id="tabs-1">
 							<h3 class="categoryHeader">
@@ -129,6 +115,7 @@ $(document).ready(function() {
 						<div id='burnup' ></div>
 						</div>
 						</div>
+						<div id="tabs-3" style="overflow:scroll"></div>
 					</div>
 				</div>
 			</div>
