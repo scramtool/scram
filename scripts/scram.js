@@ -181,7 +181,7 @@ function refreshTaskUi()
 
 function addPersonToList( person, listName)
 {
-	item = 
+	var item = 
 		$('<li/>', 
 			{
 				'class': 'personNote', 
@@ -243,7 +243,7 @@ function makePersonMarkup( person, listName)
  */
 function addTaskToList( task, listName)
 {
-	item = createTaskListItem( task);
+	var item = createTaskListItem( task);
 	item.appendTo( listName);
 }
 

@@ -73,6 +73,7 @@ function drawCharts( chart_data)
 	sprintEndDate = new Date( chart_data.sprint.end_date);
 	var days = getWeekdays( chart_data.sprint);
 	var gridDate = new Date();
+	var sprintEffort = 0;
 	
 	// create burn down, burn up and 'tantalus' series.
 	// if 'includeWeekends' is switched on the data is given as a time series (which automatically adds weekends to the
