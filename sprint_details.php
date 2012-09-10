@@ -1,25 +1,7 @@
 <?php
 require_once 'connect_db.inc.php';
-
-$member_id = -1;
-$member_name = "Somebody I Don't Know";
-$need_identification = true;
-if (isset( $_GET['member_name']))
-{
-	setcookie( 'scram_team_member_name', $_GET['member_name'], time()+60*60*24*365);
-	$member_name = $_GET['member_name'];
-	$need_identification = false;
-}
-
-if ($need_identification && isset($_COOKIE['scram_team_member_name']))
-{
-	$member_name = $_COOKIE['scram_team_member_name'];
-	$need_identification = false;
-}
-
-$member_name_db = $database->escape($member_name);
-$member = $database->get_single_result( "select resource_id from resource where name = '$member_name_db'");
-$member_id = $member['resource_id'];
+require_once 'get_username.inc.php';
+require_once 'get_sprint_id.inc.php';
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN">
 <html>
@@ -45,7 +27,8 @@ $member_id = $member['resource_id'];
 var member_id = <?=$member_id?>;
 var member_name = '<?=$member_name?>';
 var need_identification = <?=$need_identification?1:0?>;
-var sprint_id = 1;
+var sprint_id = <?=$sprint_id?>;
+
 $(document).ready(function() {
 	$( "#tabs" ).tabs();
 	loadCharts( sprint_id);

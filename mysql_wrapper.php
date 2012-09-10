@@ -57,7 +57,7 @@ class mysql_wrapper  extends database_wrapper
 		}
 		else
 		{
-			return $this->last_result[$query_result] = mysql_fetch_array( $query_result);
+			return $this->last_result[(int)$query_result] = mysql_fetch_array( $query_result);
 		}
 	}
 
@@ -67,7 +67,7 @@ class mysql_wrapper  extends database_wrapper
 		{
 			--$field;
 		}
-		return $this->last_result[$query_result][$field];
+		return $this->last_result[(int)$query_result][$field];
 	}
 
 	function num_fields( $query_result)

@@ -53,7 +53,7 @@ $(document).ready(function() {
 		<div id="menu" class="menuColumn">
 			<h2>Menu</h2>
 			<ul>
-			<li><a href="sprints.php">sprint overview</a>
+			<li><a href="sprint_details.php">sprint overview</a>
 			<li>team member page
 			</ul>
 		</div>

@@ -1,26 +1,6 @@
 var chartData;
 var burndownUrl = 'burndown_data.php';
-var includeWeekends = false;
-
-function drawBurnDown( elementname, sprint_id)
-{
-	var chart = new Charts.LineChart('burndown', {show_grid: true});
-	var day1 = new Date(2012, 9, 1);
-	var day2 = new Date(2012, 9, 5);
-	var day2b = new Date(2012, 9, 10);
-	var day3 = new Date(2012, 9, 20);
-	
-	chart.add_line({
-		  data: [[day1, 100],[day2, 200],[day3, 300]]
-		});
-
-	chart.add_line({
-		  data: [[day1, 100],[day2, 200],[day2b, 300]]
-		});
-	
-	chart.draw();
-	
-}
+var useRealDates = false;
 
 function loadCharts( sprint_id)
 {
@@ -92,13 +72,14 @@ function drawCharts( chart_data)
 	sprintStartDate = new Date( chart_data.sprint.start_date);
 	sprintEndDate = new Date( chart_data.sprint.end_date);
 	var days = getWeekdays( chart_data.sprint);
+	var gridDate = new Date();
 	
 	// create burn down, burn up and 'tantalus' series.
 	// if 'includeWeekends' is switched on the data is given as a time series (which automatically adds weekends to the
 	// horizontal axis). If not, the horizontal axis represents 'sprint days', or in other words, weekdays in the sprint.
 	$.each( chart_data.burndown, function (index, report){
 		gridDate = new Date( report.grid_date);
-		if (includeWeekends) {
+		if (useRealDates) {
 			date = gridDate;
 		}
 		else {
@@ -125,7 +106,7 @@ function drawCharts( chart_data)
 	// gridDate is now the last date for which we have a report.
 	if (gridDate < sprintEndDate) {
 		// now finish the tantalus line beyond the last report
-		if (includeWeekends) {
+		if (useRealDates) {
 			tantalus.push( [sprintEndDate, total_effort]);
 		}
 		else {
@@ -140,7 +121,7 @@ function drawCharts( chart_data)
 	fraction = total/(days.length -1);
 	dayCounter = 0;
 	$.each( days, function (index, day){
-		if (!includeWeekends) {
+		if (!useRealDates) {
 			day = dayCounter;
 		}
 		progression.push( [day, (total>0)?Math.floor( total):0]);
