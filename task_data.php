@@ -21,6 +21,7 @@ class Task
 function get_task_query( $sprint_id, $task_id = -1)
 {
 	global $database;
+	$sprint_id = $database->escape( $sprint_id);
 	$task_restriction = "";
 	if ($task_id > 0)
 	{
@@ -29,10 +30,9 @@ function get_task_query( $sprint_id, $task_id = -1)
 	}
 	else
 	{
-		$task_restriction = "";
+		$task_restriction = "WHERE task.sprint_id = $sprint_id";
 		$report_restriction = "WHERE sprint_id =$sprint_id";
 	}
-	$sprint_id = $database->escape( $sprint_id);
 	return <<<EOT
 SELECT task.* , resource.name, report.estimate, DATE_FORMAT(report_date, "%Y-%m-%d") as report_date
 FROM (
