@@ -27,7 +27,7 @@ if (isset( $_GET['member_name']))
 	<script type="text/javascript" src="scripts/jquery.numeric.js"/></script>
 	<script type="text/javascript">
 	$(document).ready(function() {
-		item = $("#member_name");
+		var item = $("#member_name");
 		$( "#member_name" ).autocomplete({
 			source: "names.php",
 			minLength: 2

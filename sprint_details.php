@@ -60,8 +60,19 @@ $(document).ready(function() {
 						</ul>
 						<div id="tabs-1" >
 						<div id="graphwrapper">
-						<div id='burndown' class="bigGraph" style="height:400px;width:540px" ><img class="centered" src="images/ajax-loader.gif"/></div>
-						<div id='burnup' class="bigGraph" style="height:400px;width:540px" ><img class="centered" src="images/ajax-loader.gif"/></div>
+							<h3 class="categoryHeader">
+								<a href="#">Burn Down</a>
+							</h3>
+							<div class="categoryContent">
+								<div id='burndown' style="width:800px;height:400px" class="bigChart"><img class="centered" src="images/ajax-loader.gif"/></div>
+							</div>
+							<h3 class="categoryHeader">
+								<a href="#">Burn Up</a>
+							</h3>
+							<div class="categoryContent">
+								<div id='burnup' style="width:800px;height:400px" class="bigChart"><img class="centered" src="images/ajax-loader.gif"/></div>
+							</div>
+						<br style="clear:both"/>
 						</div>
 						</div>
 						<div id="tabs-2">
