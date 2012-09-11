@@ -22,13 +22,13 @@ function loadAvailability( sprint_id, callback)
 function get_weekdays( sprint)
 {
 	result = new Array();
-	start = new Date( sprint.start_date);
-	end = new Date( sprint.end_date);
+	start = Date.parse( sprint.start_date);
+	end = Date.parse( sprint.end_date);
 	for (;start <= end; start.setDate( start.getDate()+1))
 	{
 		if (start.getDay() != 0 && start.getDay() != 6)
 		{
-			result.push( new Date( start.getTime()));
+			result.push( Date.parse( start.getTime()));
 		}
 	}
 	

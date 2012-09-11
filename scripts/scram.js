@@ -56,7 +56,7 @@ function submitNewTask()
 	var query = "";
 	var placeholderid = ++placeholderCounter;
 	
-	task = new Array();
+	var task = new Array();
 	$(this).parent().children("input").each( 
 			function(index, element) {
 				value =  encodeURIComponent( element.value);
@@ -135,7 +135,7 @@ function submitText( value, settings)
  */
 function makeEditable( index, value)
 {
-	task_id = $(value).attr('id').substring(16);
+	var task_id = $(value).attr('id').substring(16);
 	$(value).editable( submitText, {
 		width	  : 190,
 		height	  : 60,
@@ -166,7 +166,7 @@ function refreshTaskUi()
 		}
 		else
 		{
-			list = '#' + task.status + 'List';
+			var list = '#' + task.status + 'List';
 			addTaskToList(task, list);
 		}
 	}
@@ -200,7 +200,8 @@ function addPersonToList( person, listName)
  */
 function makeTaskMarkup( task, isInWorkList)
 {
-	if (!isInWorkList || isOnSameDay( new Date(task.report_date), new Date()))
+	var reported_time;
+	if (!isInWorkList || isOnSameDay( Date.parse(task.report_date), new Date()))
 	{
 		reported_time = '<div class="clickable estimate frozen">' + task.estimate + '</div><div>&nbsp;&nbsp;&nbsp;</div><div>' + task.name+ '</div>';
 	}
@@ -226,8 +227,8 @@ function makeTaskMarkup( task, isInWorkList)
  */
 function makeTaskPlaceholder( task)
 {
-	reported_time = '<div class="clickable estimate frozen">' + task.estimate + '</div><div>&nbsp;&nbsp;&nbsp;</div><div>' + task.name+ '&nbsp;<img class="centered" src="images/ajax-loader.gif"/></div>';
-	html = '<div class="yellowNote"><div class="taskNumbers">'+ reported_time + '</div><div id="description-for-' + task.task_id + '" class="taskDetails">'+ task.description  +'</div></div>';
+	var reported_time = '<div class="clickable estimate frozen">' + task.estimate + '</div><div>&nbsp;&nbsp;&nbsp;</div><div>' + task.name+ '&nbsp;<img class="centered" src="images/ajax-loader.gif"/></div>';
+	var html = '<div class="yellowNote"><div class="taskNumbers">'+ reported_time + '</div><div id="description-for-' + task.task_id + '" class="taskDetails">'+ task.description  +'</div></div>';
 	return html;
 }
 
@@ -299,9 +300,9 @@ function refreshSprintPeople()
  */
 function noteReceived( event, ui)
 {
-	task_id = $(ui.item).attr("id").replace('container-for-','');
-	new_status = $(this).attr("id").replace('List', '');
-	old_status = $(ui.sender).attr("id").replace('List','');
+	var task_id = $(ui.item).attr("id").replace('container-for-','');
+	var new_status = $(this).attr("id").replace('List', '');
+	var old_status = $(ui.sender).attr("id").replace('List','');
 	if (new_status == 'inProgress' && old_status == 'myTasks' )
 	{
 		$(ui.sender).sortable('cancel');

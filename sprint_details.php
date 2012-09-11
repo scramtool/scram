@@ -17,7 +17,7 @@ require_once 'get_sprint_id.inc.php';
 <script type="text/javascript" src="scripts/scram.js"></script>
 <script type="text/javascript" src="scripts/scram-charts.js"></script>
 <script type="text/javascript" src="scripts/scram-availability.js"></script>
-
+<script type="text/javascript" src="scripts/date.js"></script>
 
 <link href="css/holygrail.css" rel="stylesheet" type="text/css" />
 <link href="css/scram.css" rel="stylesheet" type="text/css" />

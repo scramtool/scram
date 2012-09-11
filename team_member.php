@@ -15,6 +15,8 @@ require_once 'get_sprint_id.inc.php';
 <script type="text/javascript" src="scripts/jquery.jeditable.mini.js"/></script>
 <script type="text/javascript" src="scripts/jquery.numeric.js"/></script>
 <script type="text/javascript" src="scripts/scram.js"></script>
+<script type="text/javascript" src="scripts/date.js"></script>
+
 <script type="text/javascript">
 var member_id = <?=$member_id?>;
 var member_name = '<?=$member_name?>';

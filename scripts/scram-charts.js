@@ -17,14 +17,14 @@ function loadCharts( sprint_id)
  */
 function getWeekdays( sprint)
 {
-	result = new Array();
-	start = new Date( sprint.start_date);
-	end = new Date( sprint.end_date);
+	var result = new Array();
+	var start = Date.parse( sprint.start_date);
+	var end = Date.parse( sprint.end_date);
 	for (;start <= end; start.setDate( start.getDate()+1))
 	{
 		if (start.getDay() != 0 && start.getDay() != 6)
 		{
-			result.push( new Date( start.getTime()));
+			result.push( Date.parse( start.getTime()));
 		}
 	}
 	
@@ -69,8 +69,8 @@ function drawCharts( chart_data)
 	var total_effort = 0;
 	var dayCounter = 0;
 	
-	sprintStartDate = new Date( chart_data.sprint.start_date);
-	sprintEndDate = new Date( chart_data.sprint.end_date);
+	var sprintStartDate = Date.parse( chart_data.sprint.start_date);
+	var sprintEndDate = Date.parse( chart_data.sprint.end_date);
 	var days = getWeekdays( chart_data.sprint);
 	var gridDate = new Date();
 	var sprintEffort = 0;
@@ -79,7 +79,7 @@ function drawCharts( chart_data)
 	// if 'includeWeekends' is switched on the data is given as a time series (which automatically adds weekends to the
 	// horizontal axis). If not, the horizontal axis represents 'sprint days', or in other words, weekdays in the sprint.
 	$.each( chart_data.burndown, function (index, report){
-		gridDate = new Date( report.grid_date);
+		gridDate = Date.parse( report.grid_date);
 		if (useRealDates) {
 			date = gridDate;
 		}
