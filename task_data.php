@@ -13,7 +13,6 @@ class Task
 		$this->resourcename	= $resourcename;
 	}
 	
-	var $id;
 	var $description;
 	var $status;
 	var $resourcename;
@@ -153,7 +152,18 @@ if (isset($_GET['action']))
 	elseif ( $action == 'move')
 	{
 		make_global( $_GET, Array('task_id', 'status', 'owner'));
-		handle_move( $task_id, $status, $owner);
+
+		// Yesteryear, I could just give an undefined variable as an argument to a function
+		// and the function would determine if it was a defined value. Nowadays I get warnings
+		// if I try to use the undefined variable.
+		if (isset( $owner))
+		{
+			handle_move( $task_id, $status, $owner);
+		}
+		else
+		{
+			handle_move( $task_id, $status, null);
+		}
 	}
 	elseif ($action == 'add')
 	{

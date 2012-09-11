@@ -30,6 +30,10 @@ var need_identification = <?=$need_identification?1:0?>;
 var sprint_id = <?=$sprint_id?>;
 
 $(document).ready(function() {
+	 $.ajaxSetup({
+	        // Disable caching of AJAX responses */
+	        cache: false
+	        });	
 	$( "#tabs" ).tabs();
 	loadCharts( sprint_id);
 	loadTasks( sprint_id, refreshSprintTasks);

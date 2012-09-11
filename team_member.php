@@ -24,7 +24,11 @@ var need_identification = <?=$need_identification?1:0?>;
 var sprint_id = <?=$sprint_id?>;
 //var tasks = new Array();
 $(document).ready(function() {
-	$(".positive-integer").numeric({ decimal: false, negative: false }, function() { alert("Positive integers only"); this.value = ""; this.focus(); });
+	 $.ajaxSetup({
+		        // Disable caching of AJAX responses */
+		        cache: false
+		        });	
+     $(".positive-integer").numeric({ decimal: false, negative: false }, function() { alert("Positive integers only"); this.value = ""; this.focus(); });
 	loadTasks( sprint_id, refreshTaskUi);
 	});
 </script>
