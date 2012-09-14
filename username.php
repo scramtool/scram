@@ -30,7 +30,7 @@ if (isset( $_GET['member_name']))
 		var item = $("#member_name");
 		$( "#member_name" ).autocomplete({
 			source: "names.php",
-			minLength: 2
+			minLength: 1
 			});
 	});
 	</script>

@@ -35,6 +35,12 @@ function get_weekdays( sprint)
 	return result;
 }
 
+/**
+ * Format the column header, which contains the date. The date is split into 3 divs, so that
+ * the table doesn't get too wide.
+ * @param date - date to create a text representation of
+ * @returns
+ */
 function formatDateHeader( date)
 {
 	div = $("<div />");
@@ -45,6 +51,12 @@ function formatDateHeader( date)
 	return div;
 }
 
+/**
+ * Create a table with a row for each developer and a column for each working day in the sprint
+ * where each cell specifies how many hours the developer will be available on that day.
+ * @param element_id the element that will receive the table.
+ * @param data data structure that contains an array of available hours for each developer.
+ */
 function createAvailabilityTable( element_id, data)
 {
 	times = data.times;

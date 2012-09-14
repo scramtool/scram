@@ -42,6 +42,10 @@ $(document).ready(function() {
 	loadAvailability( sprint_id, function ( table) { createAvailabilityTable( 'tabs-3', table);});
 	$(".newTaskButton").button( {icons: {primary: "ui-icon-plus"}, text:false}).click( submitNewTask);
 	$(".firstToFocus").focus();
+	$( "#member_name" ).autocomplete({
+		source: "names.php",
+		minLength: 1
+		});	
 	});
 
 </script>
@@ -56,6 +60,12 @@ $(document).ready(function() {
 		<div class="colright">
 			<div class="col1wrap">
 				<div class="mainColumn" id="tasks">
+					<h3 class="categoryHeader">
+						<a href="#">Sprint Details</a>
+					</h3>
+					<div class="categoryContent" id="sprintDetails">
+					</div>
+
 					<div id="tabs">
 						<ul>
 							<li><a href="#tabs-1">Stats</a></li>
@@ -81,13 +91,6 @@ $(document).ready(function() {
 						</div>
 						<div id="tabs-2">
 							<h3 class="categoryHeader">
-								<a href="#">Sprint Details</a>
-							</h3>
-							<div class="categoryContent">
-								<ul id="sprintDetails" class="taskList"></ul>
-								<br style="clear: both;" />
-							</div>
-							<h3 class="categoryHeader">
 								<a href="#">Sprint People</a>
 							</h3>
 							<div class="categoryContent">
@@ -99,11 +102,19 @@ $(document).ready(function() {
 							</h3>
 							<div class="categoryTopLine">
 								<form>
-									New task: <label for="description">Description:&nbsp;</label><input
+									New task: 
+									<label for="description">Description:&nbsp;</label>
+									<input
 										type="text" name="description" id="description"
-										class="firstToFocus" /> <label for="estimate">Initial
-										estimate:&nbsp;</label><input type="text" name="estimate"
+										class="firstToFocus" /> 
+									<label for="estimate">Initial
+										estimate:&nbsp;</label>
+									<input type="text" name="estimate"
 										id="estimate" class="estimate positive-integer" />
+									<label for="member_name">Person:&nbsp;</label>
+									<input type="text" id="member_name" name="member_name" class="member-name" />
+									<label for="is_late">Late task:&nbsp;</label>
+									<input type="checkbox" id="is_late" name="is_late">
 									<button class="newTaskButton">Submit a new task</button>
 								</form>
 							</div>

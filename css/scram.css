@@ -8,6 +8,14 @@ body {
 	float:left;
 }
 
+#sprintDetails {
+  padding: 5px;
+}
+
+#sprintDetails > h2 {
+  margin: 0;
+}
+
 .rotate270
 {
 	-webkit-transform: rotate(-90deg); 
@@ -22,6 +30,10 @@ body {
 .bigChart {
 	width: 800px;
 	height:400px;
+}
+
+.taskSelect {
+	float:right;
 }
 
 .categoryHeader

@@ -29,6 +29,11 @@ function loadTasks( sprint, callback) {
 			});
 }
 
+/**
+ * Load the data for all people involved in a sprint and call the callback when finished.
+ * @param sprint
+ * @param callback
+ */
 function loadPeople( sprint, callback)
 {
 	$.getJSON( peopleListUrl + '?sprint_id=' + sprint, 
@@ -41,16 +46,35 @@ function loadPeople( sprint, callback)
 			});	
 }
 
+/**
+ * Load the details for a sprint, such as the sprint name, the start date and the end date.
+ * @param sprint
+ * @param callback
+ */
 function loadSprintDetails( sprint, callback)
 {
 	$.getJSON( sprintDetailsUrl + '?action=get&sprint_id=' + sprint, callback);	
 }
 
+/**
+ * Show the details of the given sprint in an element with id "sprintDetails".
+ * @param sprint
+ */
 function refreshSprintDetails( sprint)
 {
 	$("#sprintDetails").html( "<h2>" + sprint.description + "</h2>Start date:" + sprint.start_date + " End date: " + sprint.end_date);
 }
 
+/**
+ * This function is called when the submit new task-button is pressed. $(this) references the button.
+ * The button is supposed to be in a form. This function will retreive all values in that form and create an
+ * ajax GET-request that should add the task to the database.
+ * In the meantime, a representation of the task is added to the global variable 'currentTasks' and a first representation
+ * is preprended to the list (<ul>) element with id "sprintTasks".
+ * 
+ * Beware: this function makes quite a few assumptions about the form that holds the submit-button.
+ * @returns {Boolean}
+ */
 function submitNewTask()
 {
 	var query = "";
@@ -84,7 +108,6 @@ function submitNewTask()
 		$.getJSON( taskListUrl + '?action=add' + query,
 				function (task)
 				{
-					alert( task.toString());
 					currentTasks['x'+task.task_id] = task;
 					$("#container-for-task-stub-" + task.placeholder).replaceWith( createTaskListItem( task));
 				});
@@ -99,6 +122,7 @@ function submitNewTask()
 
 /**
  * Submit the estimates that have been filled in by the user.
+ * This will result in a new report in the database on the server side.
  * @returns {Boolean}
  */
 function submitEstimate( )
@@ -115,6 +139,14 @@ function submitEstimate( )
 	return false;
 }
 
+/**
+ * submit a change in the a tasks text to the server side.
+ * This function returns the markup for a wait-icon and returns before the request is completed. After the request completes
+ * an element with name 'description-for-<n>' (with <n> the task id) will get updated with the accepted task text.
+ * @param value
+ * @param settings
+ * @returns {String} a temporary content for the task text element (a wait animation)
+ */
 function submitText( value, settings)
 {
      console.log(settings.submitdata.task_id);
@@ -129,7 +161,7 @@ function submitText( value, settings)
 }
 
 /**
- * Take a task details item and make it editable.
+ * Take a task details item and make it editable, by calling the editable function (from jquery.jeditable.js).
  * @param index
  * @param value
  */
@@ -146,6 +178,27 @@ function makeEditable( index, value)
         indicator : 'Please wait...',
         tooltip   : 'Click to edit...'
     });
+}
+
+/**
+ * Set up advanced ui beheviour. This is behaviour that can't be reached with stylesheets alone and that need some
+ * extra javascript to set up. It is safe to call this function multiple times on a page.
+ * This function searches the page for elements with particular classes and attaches the required behavior. Currently
+ * supported behaviour-classes are :
+ * 
+ * submitReportButton: a small button with icon and no text, inside a task div that will call submitEstimate() when pressed
+ * zoomTaskButton:     a small button with an 'expand' icon that will create a modal window on the taks details.
+ * taskDetails:        a div that becomes editable when double-clicked
+ * positive-integer:   a text input that only allows positive integers to be entered.
+ */
+function setAdvancedUIBehaviour()
+{
+	$(".submitReportButton").button( {icons: {primary: "ui-icon-gear"}, text:false}).click( submitEstimate);
+	$(".zoomTaskButton").button( {icons: {primary: "ui-icon-extlink"}, text:false});
+	$('.taskDetails').each( makeEditable); 
+	$(".positive-integer").numeric({ decimal: false, negative: false }, function() { 
+		alert("Positive integers only"); this.value = ""; this.focus(); 
+		});
 }
 
 /**
@@ -173,12 +226,17 @@ function refreshTaskUi()
 	
 	// TODO: figure out how to deal with jqui buttons after refresh.
 	// putting it here looks like an ugly hack. Which it is, of course.
-	$(".submitReportButton").button( {icons: {primary: "ui-icon-gear"}, text:false}).click( submitEstimate);
 	$(".taskList").sortable({'connectWith':'.taskList', receive: noteReceived});
-	$('.taskDetails').each( makeEditable); 
-	$(".positive-integer").numeric({ decimal: false, negative: false }, function() { alert("Positive integers only"); this.value = ""; this.focus(); });
+	setAdvancedUIBehaviour();
 }
 
+
+/**
+ * Add a representation of a person to a list with the given element id.
+ * This will create a "purple note" and add it to the given list.
+ * @param person
+ * @param listName
+ */
 function addPersonToList( person, listName)
 {
 	var item = 
@@ -194,8 +252,9 @@ function addPersonToList( person, listName)
 
 /**
  * Create the html markup for display of a task.
+ * This creates a "yellow note" with information about the task.
  * @param task The task to display
- * @param isInWorkList Whether the task is displayed in the current work list.
+ * @param isInWorkList Whether the task is displayed in the current work list (this means that a form for estimates will be shown)
  * @returns
  */
 function makeTaskMarkup( task, isInWorkList)
@@ -215,7 +274,7 @@ function makeTaskMarkup( task, isInWorkList)
 			' <button class="submitReportButton">Submit Todays numbers</button>'+
 			'</form>';
 	}
-	html = '<div class="yellowNote"><div class="taskNumbers">'+ reported_time + '</div><div id="description-for-' + task.task_id + '" class="taskDetails">'+ task.description  +'</div></div>';
+	html = '<div class="yellowNote"><div class="taskNumbers">'+ reported_time + '&nbsp;<input type="checkbox" class="taskSelect" id="selected-task-' + task.task_id + '" /><button class="zoomTaskButton" id="zoom-task-'+ task.task_id +'" /><br style="clear:both" /></div><div id="description-for-' + task.task_id + '" class="taskDetails">'+ task.description  +'</div></div>';
 	return html;
 }
 
@@ -232,6 +291,12 @@ function makeTaskPlaceholder( task)
 	return html;
 }
 
+/**
+ * Create html markup to represent a person (a "purple note").
+ * @param person
+ * @param listName
+ * @returns {String}
+ */
 function makePersonMarkup( person, listName)
 {
 	return '<div class="purpleNote">' + person.name + '</div>';
@@ -248,6 +313,11 @@ function addTaskToList( task, listName)
 	item.appendTo( listName);
 }
 
+/**
+ * Create a <li> element that will hold the html markup for a taks. The created element will have id 'container-for-<n>' with <n> a task id.
+ * @param task
+ * @returns
+ */
 function createTaskListItem( task)
 {
 	return $('<li/>', 
@@ -273,8 +343,8 @@ function refreshSprintTasks()
 	{
 		addTaskToList( currentTasks[task_key], "#sprintTasks");
 	}
-	$('.taskDetails').each( makeEditable);
-	$(".submitReportButton").button( {icons: {primary: "ui-icon-gear"}, text:false}).click( submitEstimate);
+	
+	setAdvancedUIBehaviour();
 }
 
 function refreshSprintPeople()
@@ -288,8 +358,6 @@ function refreshSprintPeople()
 		addPersonToList( currentPeople[person_key], "#sprintPeople");
 	}
 	
-//	$(".submitReportButton").button( {icons: {primary: "ui-icon-gear"}, text:false}).click( submitEstimate);
-
 }
 
 /**
@@ -329,8 +397,7 @@ function noteReceived( event, ui)
 				{
 					currentTasks['x'+task.task_id] = task;
 					$("#container-for-" + task.task_id).html( makeTaskMarkup( task, to_mytasks));
-					$(".submitReportButton").button( {icons: {primary: "ui-icon-gear"}, text:false}).click( submitEstimate);
-					$('.taskDetails').each( makeEditable); 
+					setAdvancedUIBehaviour();
 				});
 	}
 }

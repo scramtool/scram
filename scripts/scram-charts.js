@@ -12,6 +12,7 @@ function loadCharts( sprint_id)
 
 /**
  * Create an array with the weekdays in the given sprint.
+ * This functon returns an array of Date-objects, one for each working day in the sprint.
  * @param sprint
  * @returns [Date]
  */
@@ -24,13 +25,20 @@ function getWeekdays( sprint)
 	{
 		if (start.getDay() != 0 && start.getDay() != 6)
 		{
-			result.push( Date.parse( start.getTime()));
+			result.push( new Date( start.getTime()));
 		}
 	}
 	
 	return result;
 }
 
+/**
+ * Draw a chart with two lines.
+ * This function is called to draw both the burn-up and the burn-down charts
+ * @param element
+ * @param burnDownSeries
+ * @param progressionSeries
+ */
 function drawMultiLine( element, burnDownSeries, progressionSeries)
 {
 	$('#' + element).empty();
@@ -57,7 +65,11 @@ function drawMultiLine( element, burnDownSeries, progressionSeries)
 }
 
 /**
- * Given the burn up and -down data for the sprint, create the standard scrum graphs.
+ * Given the burn up and -down data for the sprint, create a burn up and burn down chart.
+ * This function creates four data series, two for each chart. Each data series consists of pairs (date, value).
+ * Dependent on the global variable 'useRealDates' the date-part of the pairs is either a real date object or a number
+ * representing the 'sprint day'. If real dates are used, the charting component used, will space the dates correctly on the 
+ * horizontal axis, but that means that weekends will also be visible, which normally 'breaks' the burn down lines.
  * @param chart_data
  */
 function drawCharts( chart_data)
@@ -76,7 +88,7 @@ function drawCharts( chart_data)
 	var sprintEffort = 0;
 	
 	// create burn down, burn up and 'tantalus' series.
-	// if 'includeWeekends' is switched on the data is given as a time series (which automatically adds weekends to the
+	// if 'useRealDates' is switched on, the data is given as a time series (which automatically adds weekends to the
 	// horizontal axis). If not, the horizontal axis represents 'sprint days', or in other words, weekdays in the sprint.
 	$.each( chart_data.burndown, function (index, report){
 		gridDate = Date.parse( report.grid_date);
