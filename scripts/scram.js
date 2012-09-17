@@ -180,8 +180,25 @@ function makeEditable( index, value)
     });
 }
 
+function showTaskDialog()
+{
+	// assume the button that causes this function to be called has an id of the
+	// form
+	// 'zoom-task-<task_id>'. Which means that if we cut of the first 10
+	// characters, we get the task id.
+	var id = $(this).attr('id').substring(10);
+	var url = 'task_form.php?task_id=' + id;
+	if (typeof theModalDialog == 'undefined') {
+		theModalDialog = $("<div />");
+	}
+	theModalDialog.html("");
+	theModalDialog.load(url).dialog({
+		modal : true
+	});
+}
+
 /**
- * Set up advanced ui beheviour. This is behaviour that can't be reached with stylesheets alone and that need some
+ * Set up advanced ui behaviour. This is behaviour that can't be reached with stylesheets alone and that need some
  * extra javascript to set up. It is safe to call this function multiple times on a page.
  * This function searches the page for elements with particular classes and attaches the required behavior. Currently
  * supported behaviour-classes are :
@@ -194,7 +211,7 @@ function makeEditable( index, value)
 function setAdvancedUIBehaviour()
 {
 	$(".submitReportButton").button( {icons: {primary: "ui-icon-gear"}, text:false}).click( submitEstimate);
-	$(".zoomTaskButton").button( {icons: {primary: "ui-icon-extlink"}, text:false});
+	$(".zoomTaskButton").button( {icons: {primary: "ui-icon-extlink"}, text:false}).click( showTaskDialog);
 	$('.taskDetails').each( makeEditable); 
 	$(".positive-integer").numeric({ decimal: false, negative: false }, function() { 
 		alert("Positive integers only"); this.value = ""; this.focus(); 
@@ -223,9 +240,8 @@ function refreshTaskUi()
 			addTaskToList(task, list);
 		}
 	}
-	
-	// TODO: figure out how to deal with jqui buttons after refresh.
-	// putting it here looks like an ugly hack. Which it is, of course.
+
+	// set up drag-n-drop between the tasklists.
 	$(".taskList").sortable({'connectWith':'.taskList', receive: noteReceived});
 	setAdvancedUIBehaviour();
 }

@@ -2,11 +2,24 @@
 body {
 	font-family: Verdana,Arial,sans-serif;
 	font-size: 80%;
+	margin: 0;
 }
+
+/*************************
+* task form styles
+*************************/
+#taskForm { background-color: #EEEE00}
+
 .taskNote
 {
 	float:left;
 }
+
+.smallChart {
+	width: 400px;
+	height:200px;
+}
+
 
 #sprintDetails {
   padding: 5px;
@@ -32,7 +45,7 @@ body {
 	height:400px;
 }
 
-.taskSelect {
+.taskSelect, .zoomTaskButton {
 	float:right;
 }
 
@@ -62,11 +75,18 @@ body {
 .taskNumbers form
 {
 	margin: 2px 0px 2px 0px;
+	float:left;
 }
 
 .taskNumbers div
 {
 	float:left;
+}
+
+
+#myTasks .yellowNote
+{
+	width: 240px;
 }
 
 .yellowNote
@@ -82,6 +102,7 @@ body {
 	height: 100px; 
 }
 
+
 .purpleNote
 {
 	border-radius: 0px 0px 6px 0px;
@@ -95,7 +116,7 @@ body {
 	height: 30px; 
 }
 
-.estimate, .submitReportButton, .dailyRation
+.estimate, .submitReportButton, .dailyRation, .zoomTaskButton
 {
 	vertical-align: middle;
 	height: 24px;
@@ -130,6 +151,7 @@ body {
 	margin-left:auto;
 	margin-right:auto;	
 }
+
 .categoryContent
 {
 padding-top: 10px;

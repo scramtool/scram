@@ -3,9 +3,9 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Sep 08, 2012 at 01:26 AM
+-- Generation Time: Sep 16, 2012 at 04:05 PM
 -- Server version: 5.5.24
--- PHP Version: 5.3.10-1ubuntu3.2
+-- PHP Version: 5.3.10-1ubuntu3.3
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -23,13 +23,27 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `availability`
+--
+
+CREATE TABLE IF NOT EXISTS `availability` (
+  `sprint_id` int(11) NOT NULL,
+  `resource_id` int(11) NOT NULL,
+  `date` date NOT NULL,
+  `hours` int(11) NOT NULL,
+  PRIMARY KEY (`sprint_id`,`resource_id`,`date`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `report`
 --
 
 CREATE TABLE IF NOT EXISTS `report` (
   `task_id` int(11) NOT NULL,
   `resource_id` int(11) NOT NULL,
-  `date` date NOT NULL,
+  `date` date NOT NULL DEFAULT '1969-10-18',
   `burnt` int(11) NOT NULL,
   `estimate` int(11) NOT NULL,
   PRIMARY KEY (`task_id`,`resource_id`,`date`)
@@ -45,7 +59,7 @@ CREATE TABLE IF NOT EXISTS `resource` (
   `resource_id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,
   PRIMARY KEY (`resource_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -59,7 +73,7 @@ CREATE TABLE IF NOT EXISTS `sprint` (
   `start_date` date NOT NULL,
   `end_date` date NOT NULL,
   PRIMARY KEY (`sprint_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -75,7 +89,7 @@ CREATE TABLE IF NOT EXISTS `task` (
   `resource_id` int(11) NOT NULL,
   PRIMARY KEY (`task_id`),
   KEY `sprint_id` (`sprint_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=32 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

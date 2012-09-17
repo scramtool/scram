@@ -2,11 +2,19 @@ var chartData;
 var burndownUrl = 'burndown_data.php';
 var useRealDates = false;
 
-function loadCharts( sprint_id)
+function loadCharts( sprint_id, burnDownElement, burnUpElement)
 {
 	$.getJSON( burndownUrl + '?sprint_id=' + sprint_id, function (data){
 		chartData = data;
-		drawCharts( data);
+		drawCharts( data, burnDownElement, burnUpElement);
+	});
+}
+
+function loadTaskCharts( sprint_id, task_id, burnDownElement, burnUpElement)
+{
+	$.getJSON( burndownUrl + '?sprint_id=' + sprint_id + '&task_id=' + task_id, function (data){
+		chartData = data;
+		drawCharts( data, burnDownElement, burnUpElement);
 	});
 }
 
@@ -65,6 +73,34 @@ function drawMultiLine( element, burnDownSeries, progressionSeries)
 }
 
 /**
+ * Calculate the number of weekdays between two dates.
+ * This is the _really_ simple implementation that iterates over all dates between the two given dates and determines whether they are
+ * weekdays.
+ */
+function weekDaysBetween( date1, date2)
+{
+	if (date1 > date2) {
+		start = new Date( date2.getTime());
+		end = date1;
+	} else {
+		start = new Date( date1.getTime());
+		end = date2;
+	}
+
+	var counter = 0;
+	while (start < end)
+	{
+		if (start.getDay() != 0 && start.getDay() != 6)
+		{
+			++counter;
+		}
+		start.setDate( start.getDate() + 1);
+	}
+
+	return counter;
+}
+
+/**
  * Given the burn up and -down data for the sprint, create a burn up and burn down chart.
  * This function creates four data series, two for each chart. Each data series consists of pairs (date, value).
  * Dependent on the global variable 'useRealDates' the date-part of the pairs is either a real date object or a number
@@ -72,7 +108,7 @@ function drawMultiLine( element, burnDownSeries, progressionSeries)
  * horizontal axis, but that means that weekends will also be visible, which normally 'breaks' the burn down lines.
  * @param chart_data
  */
-function drawCharts( chart_data)
+function drawCharts( chart_data, burnDownElement, burnUpElement)
 {
 	
 	var burndown_data = [];
@@ -96,7 +132,7 @@ function drawCharts( chart_data)
 			date = gridDate;
 		}
 		else {
-			date = dayCounter;
+			date = weekDaysBetween( sprintStartDate, gridDate);
 		}
 
 		total_effort =  parseFloat( report.burn_down) + parseFloat( report.burn_up);
@@ -143,7 +179,11 @@ function drawCharts( chart_data)
 	});
 	
 	
+	if (burnDownElement != null) {
+		drawMultiLine( burnDownElement, burndown_data, progression);
+	}
 	
-	drawMultiLine( 'burndown', burndown_data, progression);
-	drawMultiLine( 'burnup', burnup_data, tantalus);
+	if (burnUpElement != null) {
+		drawMultiLine( burnUpElement, burnup_data, tantalus);
+	}
 }

@@ -34,11 +34,11 @@ $(document).ready(function() {
 	        // Disable caching of AJAX responses */
 	        cache: false
 	        });	
+	loadSprintDetails( sprint_id, refreshSprintDetails);
 	$( "#tabs" ).tabs();
-	loadCharts( sprint_id);
+	loadCharts( sprint_id, 'burndown', 'burnup');
 	loadTasks( sprint_id, refreshSprintTasks);
 	loadPeople( sprint_id, refreshSprintPeople);
-	loadSprintDetails( sprint_id, refreshSprintDetails);
 	loadAvailability( sprint_id, function ( table) { createAvailabilityTable( 'tabs-3', table);});
 	$(".newTaskButton").button( {icons: {primary: "ui-icon-plus"}, text:false}).click( submitNewTask);
 	$(".firstToFocus").focus();

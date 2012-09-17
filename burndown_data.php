@@ -17,9 +17,18 @@ require_once 'connect_db.inc.php';
  * @param unknown_type $sprint_id
  * @return string
  */
-function get_burndown_grid_query( $sprint_id)
+function get_burndown_grid_query( $sprint_id, $task_id = 0)
 {
 	global $database;
+	if ($task_id > 0)
+	{
+		$task_filter = "WHERE grid_reports.task_id = $task_id";
+	}
+	else
+	{
+		$task_filter = "";
+	}
+	
 	$sprint_id = $database->escape( $sprint_id);
 	return <<<EOT
 	select report.*, grid_date, task_burn
@@ -35,6 +44,7 @@ function get_burndown_grid_query( $sprint_id)
 	             on report.task_id = grid.task_id and report.date <= grid.date group by grid.task_id, grid.date
 	      ) as grid_reports
 	     on last_date = report.date and grid_reports.task_id = report.task_id
+	     $task_filter
 	order by grid_date, report.task_id
 EOT;
 }
@@ -49,9 +59,9 @@ EOT;
  * @param unknown_type $sprint_id
  * @return string
  */
-function get_burndown_query( $sprint_id)
+function get_burndown_query( $sprint_id, $task_id = 0)
 {
-	$grid_query = get_burndown_grid_query($sprint_id);
+	$grid_query = get_burndown_grid_query($sprint_id, $task_id);
 	return "select grid_date, sum( estimate) as burn_down, sum( task_burn) as burn_up from ($grid_query) as bd_grid group by grid_date";
 }
 
@@ -83,10 +93,17 @@ function print_burndown_query( $sprint_id)
 	}
 }
 
-function print_chart_data( $sprint_id)
+/**
+ * Output the results of the burndown-query to standard output in json format.
+ * If task_id is provided, then the burndown reported will be for this task only.
+ * 
+ * @param unknown_type $sprint_id
+ * @param unknown_type $task_id
+ */
+function print_chart_data( $sprint_id, $task_id = 0)
 {
 	global $database;
-	$database->get_result_table(get_burndown_query($sprint_id), $headers, $burndown);
+	$database->get_result_table(get_burndown_query($sprint_id, $task_id), $headers, $burndown);
 	$sprint = $database->get_single_result("select * from sprint where sprint_id = $sprint_id");
 	
 	print json_encode(array( 'burndown' => $burndown, 'sprint' => $sprint));
@@ -95,6 +112,14 @@ function print_chart_data( $sprint_id)
 if (isset( $_GET['sprint_id']))
 {
 	$sprint_id = $_GET['sprint_id'];
-	//print_burndown_query($sprint_id);
-	print_chart_data( $sprint_id);
+	
+	if (isset($_GET['task_id']))
+	{
+		$task_id = $_GET['task_id'];
+		print_chart_data( $sprint_id, $task_id);
+	}
+	else
+	{
+		print_chart_data( $sprint_id);
+	}
 }
