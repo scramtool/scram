@@ -84,23 +84,33 @@ function handle_move( $task_id, $status, $owner)
  * @param unknown_type $sprint_id
  * @param unknown_type $placeholder
  */
-function handle_add( $description, $estimate, $sprint_id, $placeholder)
+function handle_add( $arguments)
 {
 	global $database;
 	
-	$description = $database->escape($description);
-	$estimate	 = $database->escape($estimate);
-	$sprint_id 	 = $database->escape($sprint_id);
+	$description = $database->escape(get_if_defined($arguments, 'description'));
+	$estimate	 = $database->escape(get_if_defined($arguments, 'estimate', 8));
+	$sprint_id 	 = $database->escape(get_if_defined($arguments, 'sprint_id'));
+	$name		 = $database->escape(get_if_defined($arguments, 'member_name', 'Nobody'));
+	$is_late	 = $database->escape(get_if_defined($arguments, 'is_late', false));
+	$placeholder = get_if_defined($arguments, 'placeholder', 0);
 	
-	// insert a task into the database. A task id will be created automatically, so we need to retreive that.
-	$database->exec("INSERT INTO task(sprint_id, description) VALUES ( $sprint_id, '$description')");
+	$member_id = get_user_id( $database, $name);
+	
+	// insert a task into the database. A task id will be created automatically, so we need to retrieve that.
+	$database->exec("INSERT INTO task(sprint_id, description, resource_id) VALUES ( $sprint_id, '$description', $member_id)");
 	$id = $database->last_inserted_id();
 	
-	if (isset($estimate))
+	if ($is_late)
 	{
-		// insert a new report. By default, the date of the report will be today.
-		$database->exec("INSERT INTO report( task_id, resource_id, burnt, estimate) VALUES( $id, 0, 0, $estimate)");
+		$date_expression = 'NOW()';
 	}
+	else 
+	{
+		// find a random ( :) ) date that is earlier than the first sprint date.
+		$date_expression = "'1969-10-18'";	
+	}
+    $database->exec("INSERT INTO report( task_id, resource_id, burnt, estimate, date) VALUES( $id, 0, 0, $estimate, $date_expression)");
 	
 	$task_info = $database->get_single_result( get_task_query( 0, $id));
 	$task_info['placeholder'] = $placeholder;
@@ -136,8 +146,7 @@ if (isset($_GET['action']))
 	}
 	elseif ($action == 'add')
 	{
-		make_global( $_GET, Array('estimate', 'description', 'placeholder', 'sprint_id'));
-		handle_add( $description, $estimate, $sprint_id, $placeholder);
+		handle_add( $_GET);
 	}
 	
 }

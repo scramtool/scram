@@ -153,7 +153,7 @@ function drawCharts( chart_data, burnDownElement, burnUpElement)
 	});
 	
 	// gridDate is now the last date for which we have a report.
-	if (gridDate < sprintEndDate) {
+	if (gridDate < sprintEndDate || tantalus.length == 1) {
 		// now finish the tantalus line beyond the last report
 		if (useRealDates) {
 			tantalus.push( [sprintEndDate, total_effort]);

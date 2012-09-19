@@ -96,7 +96,7 @@ function submitNewTask()
 		query += '&sprint_id=' + sprint_id;
 		
 		task.name = "Nobody";
-		item = 
+		var item = 
 			$('<li/>', 
 				{
 					'class': 'taskNote', 

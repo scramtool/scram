@@ -43,7 +43,7 @@ I need to know who you are. Please give your name here. The name you use here wi
 This page should be shown only once. The name you provide here will be remembered.
 <div id="dialog-form" title="Create new user">
 <form method="get">
-<label for="name">Name</label>
+<label for="member_name">Name</label>
 <input name="member_name" id="member_name" />
 <input type="submit" value="Continue"/>
 </form>

@@ -1,7 +1,7 @@
 <?php
 /**
  * After including this page, the global variable $member_id will be set.
- * If the name of the team meber cannot be determined by looking at either the get-variables or cookies, this 
+ * If the name of the team member cannot be determined by looking at either the get-variables or cookies, this 
  * file will redirect to a form that asks the user for a name.
  * 
  * Note that currently, this is in no way a form of user _authentication_ the user is asked for a name, that's all.

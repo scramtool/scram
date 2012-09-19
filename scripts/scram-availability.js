@@ -43,7 +43,7 @@ function get_weekdays( sprint)
  */
 function formatDateHeader( date)
 {
-	div = $("<div />");
+	var div = $("<div />");
 	$.each( date.toDateString().split(' '), function (index, value){
 		$("<div/>").text( value).appendTo( div);
 	});
