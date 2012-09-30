@@ -61,3 +61,15 @@ function get_user_id( $database, $user_name)
 	}
 	return $id;
 }
+
+function dispatch_command( $inputs, $command_keyword, $handlers)
+{
+	if (isset( $inputs[$command_keyword]))
+	{
+		$command = $inputs[$command_keyword];
+		if (isset( $handlers[$command]))
+		{
+			$handlers[$command]( $inputs);
+		}
+	}
+}

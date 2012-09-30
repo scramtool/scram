@@ -2,6 +2,7 @@
 require_once 'connect_db.inc.php';
 require_once 'utilities.inc.php';
 require_once 'task_data.inc.php';
+require_once 'log.inc.php';
 
 class Task
 {
@@ -41,11 +42,15 @@ function print_single_task( $task_id)
 function handle_report( $task_id, $estimate, $spent)
 {
 	global $database;
+	$log= new Log( $database);
+	$log->estimate($task_id, $estimate, $spent);
+	
 	$success = $database->exec("INSERT INTO report(task_id, resource_id, date, burnt, estimate) SELECT $task_id, resource_id, NOW(), $spent, $estimate FROM task WHERE task_id = $task_id");
 	if ($success)
 	{
 		print_single_task( $task_id);
 	}
+	
 }
 
 function handle_move( $task_id, $status, $owner)
@@ -69,6 +74,9 @@ function handle_move( $task_id, $status, $owner)
 	{
 		print_single_task($task_id);
 	}
+	
+	$log = new Log( $database);
+	$log->move($task_id, $status);
 	
 }
 

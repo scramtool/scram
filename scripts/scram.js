@@ -5,6 +5,8 @@ var taskListUrl = 'task_data.php';
 var peopleListUrl = 'people_data.php';
 var changeTextUrl = 'change_task_text.php';
 var sprintDetailsUrl = 'sprint_data.php';
+var logUrl = 'log_data.php';
+
 var placeholderCounter = 0;
 
 /**
@@ -27,6 +29,29 @@ function loadTasks( sprint, callback) {
 				});
 				callback();
 			});
+}
+
+function loadLogs( sprint, callback)
+{
+	$.getJSON( logUrl + '?sprint_id=' + sprint, callback);
+}
+
+function refreshLogs( data)
+{
+	var personTemplate = $('#personTemplate');
+	personTemplate.hide();
+	var lastPerson = "";
+	var currentPersonMarkup = personTemplate;
+	$.each( data, function (index, log) {
+		if (log.name != lastPerson) {
+			var previousPersonMarkup = currentPersonMarkup;
+			currentPersonMarkup = personTemplate.clone();
+			currentPersonMarkup.insertAfter( previousPersonMarkup);
+			lastPerson = log.name;
+			currentPeronsMarkup.show();
+		}
+		
+	});
 }
 
 /**
@@ -290,7 +315,7 @@ function makeTaskMarkup( task, isInWorkList)
 			' <button class="submitReportButton">Submit Todays numbers</button>'+
 			'</form>';
 	}
-	html = '<div class="yellowNote"><div class="taskNumbers">'+ reported_time + '&nbsp;<input type="checkbox" class="taskSelect" id="selected-task-' + task.task_id + '" /><button class="zoomTaskButton" id="zoom-task-'+ task.task_id +'" /><br style="clear:both" /></div><div id="description-for-' + task.task_id + '" class="taskDetails">'+ task.description  +'</div></div>';
+	html = '<div class="yellowNote"><div class="taskNumbers">'+ reported_time + '<div style="float:right"><input type="checkbox" class="taskSelect" id="selected-task-' + task.task_id + '" /><button class="zoomTaskButton" id="zoom-task-'+ task.task_id +'" /></div><br style="clear:both" /></div><div id="description-for-' + task.task_id + '" class="taskDetails">'+ task.description  +'</div></div>';
 	return html;
 }
 
@@ -426,7 +451,7 @@ function noteReceived( event, ui)
  */
 function worksOnTask( resourceId, taskInfo)
 {
-	return taskInfo.resource_id == resourceId && taskInfo.status == 'inProgress';
+	return taskInfo.resource_id == resourceId && (taskInfo.status == 'inProgress');
 }
 
 

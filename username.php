@@ -12,7 +12,7 @@ if (isset( $_GET['member_name']))
 	{
 		$database->exec("INSERT INTO resource( name) VALUES('$name')");
 	}
-	setcookie( 'scram_team_member_name', $_GET['member_name'], time()+60*60*24*365);
+	setcookie( 'scram_team_member_name', $name, time()+60*60*24*365);
 	header("Location: team_member.php");
 }
 ?>

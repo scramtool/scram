@@ -12,6 +12,7 @@ RIGHT OUTER JOIN task ON task.resource_id = resource.resource_id
 WHERE resource.resource_id IS NOT NULL
 AND task.sprint_id =$sprint_id
 GROUP BY resource.resource_id
+ORDER BY name
 EOT;
 
 	$headers = array();
