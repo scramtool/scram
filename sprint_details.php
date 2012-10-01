@@ -39,7 +39,7 @@ $(document).ready(function() {
 	loadCharts( sprint_id, 'burndown', 'burnup');
 	loadTasks( sprint_id, refreshSprintTasks);
 	loadPeople( sprint_id, refreshSprintPeople);
-	loadAvailability( sprint_id, function ( table) { createAvailabilityTable( 'tabs-3', table);});
+	loadAvailability( sprint_id, function ( table) { createAvailabilityTable( sprint_id, 'tabs-3', table);});
 	$(".newTaskButton").button( {icons: {primary: "ui-icon-plus"}, text:false}).click( submitNewTask);
 	$(".firstToFocus").focus();
 	$( "#member_name" ).autocomplete({

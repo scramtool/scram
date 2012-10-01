@@ -2,10 +2,18 @@
 require_once 'connect_db.inc.php';
 require_once 'utilities.inc.php';
 
-function get_availability( $sprint_id)
+/**
+ * Return a json-encoded object with availability information for a sprint with a given sprint-id.
+ * 
+ * @param unknown_type $inputs This must be an associative array with at least a key 'sprint_id' for 
+ *                      which the value is the id of the requested sprint.
+ * 
+ * @return a json encoded object of the shape {resources: <array of resources in this sprint>, times: <
+ */
+function get_availability( &$inputs)
 {
 	global $database;
-	$sprint_id = $database->escape($sprint_id);
+	$sprint_id = $database->escape($inputs['sprint_id']);
 	$query = "select r.name, r.resource_id, date, hours from resource as r join availability as a on r.resource_id = a.resource_id where a.sprint_id = $sprint_id order by r.name, date";
 	$list = array();
 	$dummy_header = array();
@@ -14,17 +22,58 @@ function get_availability( $sprint_id)
 	$times = array();
 	foreach ($list as $row) {
 		$date = strtotime( $row['date']);
-		$year = date( "%Y", $date);
-		$month = date( "%m", $date);
-		$day = date( "%d", $date);
+		$year = date( "Y", $date);  // four-digit year.
+		$month = date( "n", $date); // month without leading zeros.
+		$day = date( "j", $date);   // day without leading zeros.
 		$key = 'k_' . $row['resource_id'] . "_$year-$month-$day";
 		$times[$key] = $row['hours'];
 	};
 	
 	$sprint = $database->get_single_result( "select * from sprint where sprint_id = $sprint_id");
 	$database->get_result_table("select resource_id, name from resource", $dummy_header, $resources);
-	return array( 'resources' => $resources, 'times' => $times, 'sprint' => $sprint);
+	return json_encode( array( 'resources' => $resources, 'times' => $times, 'sprint' => $sprint));
 }
 
-make_global( $_GET, array('sprint_id'));
-print json_encode( get_availability( $sprint_id));
+/**
+ * This function expects the $inputs array to contain at least a key 'sprint_id' and 
+ * a number of keys with format k_<resource-id>_<year>-<month>-<day>. for each found item, It will add an
+ * availability record for the given resource id on the given date, where the value represents the number of hours.
+ * Before inserting availability records, all existing records for the given sprint will be deleted.
+ * 
+ * @param unknown_type $inputs
+ */
+function change_availability( &$inputs)
+{
+	global $database;
+	$sprint_id = $database->escape( $inputs['sprint_id']);
+	$insert_array = Array();
+	$count = 0;
+	foreach ( $inputs as $key => $value)
+	{
+		if (preg_match('/k_(\d+)_(\d{4}-\d+-\d+)/', $key, $key_parts))
+		{
+			$insert_array[] = "($sprint_id, $key_parts[1], '$key_parts[2]', $value)";
+			++$count;
+		}
+	}
+	
+	if ($count)
+	{
+		$insert_string = implode(',', $insert_array);
+		$database->exec( "DELETE FROM availability WHERE sprint_id = $sprint_id");
+		$database->exec( "INSERT INTO availability(sprint_id, resource_id, date, hours) VALUES $insert_string");
+	}
+	
+	return get_availability( $inputs);
+}
+
+if (isset($_GET['action']))
+{
+	$input = &$_GET;
+}
+else
+{
+	$input = &$_POST;
+}
+
+print dispatch_command($input, 'action', array( 'get' => 'get_availability', 'post' => 'change_availability'));

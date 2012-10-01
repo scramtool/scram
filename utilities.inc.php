@@ -69,7 +69,11 @@ function dispatch_command( $inputs, $command_keyword, $handlers)
 		$command = $inputs[$command_keyword];
 		if (isset( $handlers[$command]))
 		{
-			$handlers[$command]( $inputs);
+			return $handlers[$command]( $inputs);
 		}
+	}
+	else
+	{
+		return false;
 	}
 }

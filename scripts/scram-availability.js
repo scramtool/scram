@@ -1,5 +1,5 @@
 
-var getAvailabilityUrl = "availability.php";
+var availabilityUrl = "availability.php";
 
 var times;
 
@@ -11,7 +11,7 @@ var times;
  */
 function loadAvailability( sprint_id, callback)
 {
-	$.getJSON( getAvailabilityUrl + '?sprint_id=' + sprint_id, callback);
+	$.getJSON( availabilityUrl + '?action=get&sprint_id=' + sprint_id, callback);
 }
 
 /**
@@ -57,7 +57,7 @@ function formatDateHeader( date)
  * @param element_id the element that will receive the table.
  * @param data data structure that contains an array of available hours for each developer.
  */
-function createAvailabilityTable( element_id, data)
+function createAvailabilityTable( sprint_id, element_id, data)
 {
 	times = data.times;
 	var table = $("<table style='availability' />");
@@ -65,23 +65,23 @@ function createAvailabilityTable( element_id, data)
 	var header = $("<tr></tr>");
 	$("<th>name</th>").appendTo( header);
 	$.each( dates, function (index, date){
-		td = $("<th/>");
+		var td = $("<th/>");
 		td.append( formatDateHeader( date));
 		td.appendTo( header);
 	});
 	header.appendTo( table);
 	$.each( data.resources, function (index, resource) {
-		id = resource.resource_id;
+		var id = resource.resource_id;
 		var row = $("<tr />");
 		$("<td />").text( resource.name).appendTo( row);
 		$.each( dates, function (index2, date){
-			day = date.getDate();
-			month = date.getMonth() + 1;
-			year = date.getFullYear();
+			var day = date.getDate();
+			var month = date.getMonth() + 1;
+			var year = date.getFullYear();
 			
-			key = 'k_' + id + "_" + year + '-' + month + '-' + day;
-			val = (data.times[key])?(data.times[key]):"";
-			td = $('<td />');
+			var key = 'k_' + id + "_" + year + '-' + month + '-' + day;
+			var val = (data['times'][key])?(data['times'][key]):"";
+			var td = $('<td />');
 			$("<input />").attr({'id':key,'name':key,'type':'text','class':"hourCell positive-integer dailyRation", 'value': val})
 //			$("<input />").data('id', key).data('type', 'text').data('style', 'hourCell positive-integer dailyRation')
 				.appendTo( td);
@@ -89,7 +89,30 @@ function createAvailabilityTable( element_id, data)
 		});
 		row.appendTo( table);
 	});
+	var form = $('<form />').attr( { 'method':'POST', 'action':availabilityUrl + '?action=error'});
+	form.append(table);
+	$('<input />').attr( {'type':'submit', 'value':'Submit'}).appendTo( form);
+	form.submit( function (event){
+		event.preventDefault();
+		
+		$(this).children().filter(":input[type='submit']").attr('disabled','disabled');
+		var compressed= {'sprint_id': sprint_id, 'action':'post'};
+		
+		// collect all hourCell values that are non-trivial (not zero or empty).
+		$('.hourCell').each( function (index) {
+			var value = $(this).attr( 'value');
+			if ( parseInt(value) != 0 && value != '') {
+				var key = $(this).attr( 'id');
+				compressed[ key] = value; 
+			}
+		});
+		
+		$.post( availabilityUrl, compressed, function (newData) {
+			createAvailabilityTable( sprint_id, element_id, newData);},
+			'json');
+	});
+	$('#' + element_id).html('');
+	$('#' + element_id).append( form);
 	
-	$('#' + element_id).append( table);
 	
 }

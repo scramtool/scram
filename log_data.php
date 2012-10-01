@@ -21,8 +21,8 @@ function get_logs( &$parameters)
 	print( get_log_query( $sprint_id, $start_date, $end_date));
 	$database->get_result_table(get_log_query( $sprint_id, $start_date, $end_date), $headers, $logs);
 	
-	print json_encode($logs);
+	return json_encode($logs);
 	
 }
 
-dispatch_command( $_GET, 'action', array( 'get' => 'get_logs'));
+print dispatch_command( $_GET, 'action', array( 'get' => 'get_logs'));

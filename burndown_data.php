@@ -1,4 +1,5 @@
 <?php
+require_once 'config.inc.php';
 require_once 'connect_db.inc.php';
 
 /**
@@ -65,6 +66,24 @@ function get_burndown_query( $sprint_id, $task_id = 0)
 	return "select grid_date, sum( estimate) as burn_down, sum( task_burn) as burn_up from ($grid_query) as bd_grid group by grid_date";
 }
 
+/**
+ * Construct a query that gives the cumulative amount of available developer hours for 
+ * each sprint day.
+ * 
+ * 
+ * @param unknown_type $sprint_id
+ * @param unknown_type $task_id
+ */
+function get_available_query( $sprint_id, $task_id = 0)
+{
+	global $effective_hours_factor;
+	return 
+	"SELECT date, (sum( hours) * $effective_hours_factor) as hours ".
+	"FROM availability " .
+	"WHERE sprint_id = $sprint_id ".
+	"GROUP BY date ".
+	"ORDER BY date ";
+}
 
 /**
  * Output the results of the burndown-query to standard output in csv-format.
@@ -104,9 +123,10 @@ function print_chart_data( $sprint_id, $task_id = 0)
 {
 	global $database;
 	$database->get_result_table(get_burndown_query($sprint_id, $task_id), $headers, $burndown);
+	$database->get_result_table( get_available_query($sprint_id), $headers, $availability);
 	$sprint = $database->get_single_result("select * from sprint where sprint_id = $sprint_id");
 	
-	print json_encode(array( 'burndown' => $burndown, 'sprint' => $sprint));
+	print json_encode(array( 'burndown' => $burndown, 'sprint' => $sprint, 'availability' => $availability));
 }
 
 if (isset( $_GET['sprint_id']))

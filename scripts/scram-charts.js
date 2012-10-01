@@ -47,7 +47,7 @@ function getWeekdays( sprint)
  * @param burnDownSeries
  * @param progressionSeries
  */
-function drawMultiLine( element, burnDownSeries, progressionSeries)
+function drawMultiLine( element, burnDownSeries, progressionSeries, availabilitySeries)
 {
 	$('#' + element).empty();
 	var chart = new Charts.LineChart( element, {show_grid: true});
@@ -66,6 +66,17 @@ function drawMultiLine( element, burnDownSeries, progressionSeries)
 		options: {
 			line_color: "#00aadd",
 			fill_area: false
+		}
+	});
+
+	chart.add_line( {
+		data: availabilitySeries,
+		options: {
+			line_color: "orange",
+			dot_color: "orange",
+			dot_size: 2,
+			fill_area: false,
+			line_width: 1
 		}
 	});
 	
@@ -126,6 +137,7 @@ function drawCharts( chart_data, burnDownElement, burnUpElement)
 	// create burn down, burn up and 'tantalus' series.
 	// if 'useRealDates' is switched on, the data is given as a time series (which automatically adds weekends to the
 	// horizontal axis). If not, the horizontal axis represents 'sprint days', or in other words, weekdays in the sprint.
+	var currentBurnup = 0;
 	$.each( chart_data.burndown, function (index, report){
 		gridDate = Date.parse( report.grid_date);
 		if (useRealDates) {
@@ -143,6 +155,7 @@ function drawCharts( chart_data, burnDownElement, burnUpElement)
 			// add a new point to the tantalus line
 			tantalus.push( [date, total_effort]);
 			burnup_data.push( [date, report.burn_up]);
+			currentBurnup = report.burn_up; // collect the latest burn up value
 		}
 		
 		if (gridDate <= sprintStartDate ) {
@@ -164,26 +177,52 @@ function drawCharts( chart_data, burnDownElement, burnUpElement)
 	}
 		
 
-	// create the 'ideal' burndown line.
-	progression = [];
-	total = sprintEffort;
-	fraction = total/(days.length -1);
-	dayCounter = 0;
-	$.each( days, function (index, day){
+	// create the availability data
+	var indexInDaysArray = 0;
+	var cumulativeAvailability = [];
+	var totalAvailability = 0;
+	var lastDate;
+	$.each( chart_data.availability, function (index, avail){
+		lastDate = Date.parse(avail.date);
+		while( lastDate > days[indexInDaysArray]) {
+			cumulativeAvailability[indexInDaysArray++] = totalAvailability;
+		}
+		totalAvailability += parseFloat( avail.hours);
+	});
+	while( cumulativeAvailability.length < days.length) {
+		cumulativeAvailability.push( totalAvailability);
+	}
+	
+	// create the 'ideal' burndown line and the critical burn up and -down line.
+	var progression = [];
+	var availabilityProgression = [];
+	var availabilityProjection = [];
+	var total = sprintEffort;
+	var fraction = total/(days.length -1);
+	var dayCounter = 0;
+	var burnupOffset = 0;
+	$.each( days, function (index, realDay){
+		// decide whether we use sprint days or real days
 		if (!useRealDates) {
 			day = dayCounter;
 		}
+		else {
+			day = realDay;
+		}
+		
+		availabilityProgression.push([day, totalAvailability - cumulativeAvailability[dayCounter]]);
 		progression.push( [day, (total>0)?Math.floor( total):0]);
+		availabilityProjection.push( [day, total_effort - totalAvailability + cumulativeAvailability[dayCounter]]);
 		total -= fraction;
 		++dayCounter;
 	});
 	
 	
 	if (burnDownElement != null) {
-		drawMultiLine( burnDownElement, burndown_data, progression);
+		drawMultiLine( burnDownElement, burndown_data, progression, availabilityProgression);
 	}
 	
 	if (burnUpElement != null) {
-		drawMultiLine( burnUpElement, burnup_data, tantalus);
+		drawMultiLine( burnUpElement, burnup_data, tantalus, availabilityProjection);
 	}
 }
