@@ -6,16 +6,21 @@ function loadCharts( sprint_id, burnDownElement, burnUpElement)
 {
 	$.getJSON( burndownUrl + '?sprint_id=' + sprint_id, function (data){
 		chartData = data;
-		drawCharts( data, burnDownElement, burnUpElement);
+		drawCharts( data, burnDownElement, burnUpElement, true);
 	});
 }
 
 function loadTaskCharts( sprint_id, task_id, burnDownElement, burnUpElement)
 {
 	$.getJSON( burndownUrl + '?sprint_id=' + sprint_id + '&task_id=' + task_id, function (data){
-		chartData = data;
-		drawCharts( data, burnDownElement, burnUpElement);
+		drawCharts( data, burnDownElement, burnUpElement, false);
 	});
+}
+
+function redrawCharts( burndownElement, burnUpElement, realDates, addAvailability)
+{
+	useRealDates = realDates;
+	drawCharts( chartData, burndownElement, burnUpElement, addAvailability);
 }
 
 /**
@@ -119,7 +124,7 @@ function weekDaysBetween( date1, date2)
  * horizontal axis, but that means that weekends will also be visible, which normally 'breaks' the burn down lines.
  * @param chart_data
  */
-function drawCharts( chart_data, burnDownElement, burnUpElement)
+function drawCharts( chart_data, burnDownElement, burnUpElement, addAvailability)
 {
 	
 	var burndown_data = [];
@@ -200,7 +205,6 @@ function drawCharts( chart_data, burnDownElement, burnUpElement)
 	var total = sprintEffort;
 	var fraction = total/(days.length -1);
 	var dayCounter = 0;
-	var burnupOffset = 0;
 	$.each( days, function (index, realDay){
 		// decide whether we use sprint days or real days
 		if (!useRealDates) {
@@ -210,9 +214,13 @@ function drawCharts( chart_data, burnDownElement, burnUpElement)
 			day = realDay;
 		}
 		
-		availabilityProgression.push([day, totalAvailability - cumulativeAvailability[dayCounter]]);
+		if (addAvailability) {
+
+			availabilityProgression.push([day, totalAvailability - cumulativeAvailability[dayCounter]]);
+			availabilityProjection.push( [day, total_effort - totalAvailability + cumulativeAvailability[dayCounter]]);
+		}
+		
 		progression.push( [day, (total>0)?Math.floor( total):0]);
-		availabilityProjection.push( [day, total_effort - totalAvailability + cumulativeAvailability[dayCounter]]);
 		total -= fraction;
 		++dayCounter;
 	});

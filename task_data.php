@@ -14,7 +14,7 @@ class Task
 		$this->resource 	= $resource;
 		$this->resourcename	= $resourcename;
 	}
-	
+
 	var $description;
 	var $status;
 	var $resourcename;
@@ -25,7 +25,7 @@ function print_task_data( $sprint_id)
 	global $database;
 	$headers = array();
 	$tasks = array();
-	
+
 	$database->get_result_table( get_task_query($sprint_id), $headers, $tasks);
 
 	print json_encode($tasks);
@@ -36,7 +36,6 @@ function print_single_task( $task_id)
 	global $database;
 	$task_info = $database->get_single_result( get_task_query( 0, $task_id));
 	print json_encode($task_info);
-	
 }
 
 function handle_report( $task_id, $estimate, $spent)
@@ -44,13 +43,13 @@ function handle_report( $task_id, $estimate, $spent)
 	global $database;
 	$log= new Log( $database);
 	$log->estimate($task_id, $estimate, $spent);
-	
+
 	$success = $database->exec("INSERT INTO report(task_id, resource_id, date, burnt, estimate) SELECT $task_id, resource_id, NOW(), $spent, $estimate FROM task WHERE task_id = $task_id");
 	if ($success)
 	{
 		print_single_task( $task_id);
 	}
-	
+
 }
 
 function handle_move( $task_id, $status, $owner)
@@ -68,16 +67,27 @@ function handle_move( $task_id, $status, $owner)
 		$owner_update = '';
 	}
 	
-	$query = "UPDATE task SET status='$status' $owner_update WHERE task_id = $task_id";
-	$success = $database->exec($query);
+	
+	$move_query = "UPDATE task SET status='$status' $owner_update WHERE task_id = $task_id";
+	$success = $database->exec($move_query);
+	
 	if ($success)
 	{
 		print_single_task($task_id);
 	}
+
+	// if the new status is 'forwarded', automatically add a report setting the tasks new estimate to 0
+	if ($status == 'forwarded')
+	{
+		$report_query = 
+			"INSERT INTO report(task_id, resource_id, date, reason, burnt, estimate) ".
+			"SELECT $task_id, resource_id, NOW(), 'forward', 0, 0 FROM task WHERE task_id = $task_id";
+			
+		$database->exec( $report_query);
+	}
 	
 	$log = new Log( $database);
 	$log->move($task_id, $status);
-	
 }
 
 /**

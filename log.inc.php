@@ -4,7 +4,6 @@ class Log
 	function __construct( $database)
 	{
 		$this->database = $database;
-		$this->resource_id = $resource_id;
 	}
 	
 	function estimate( $task_id, $new_estimate, $time_spent)

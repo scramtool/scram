@@ -3,9 +3,9 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Sep 16, 2012 at 04:05 PM
+-- Generation Time: Oct 01, 2012 at 03:59 AM
 -- Server version: 5.5.24
--- PHP Version: 5.3.10-1ubuntu3.3
+-- PHP Version: 5.3.10-1ubuntu3.4
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -32,6 +32,21 @@ CREATE TABLE IF NOT EXISTS `availability` (
   `date` date NOT NULL,
   `hours` int(11) NOT NULL,
   PRIMARY KEY (`sprint_id`,`resource_id`,`date`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `log`
+--
+
+CREATE TABLE IF NOT EXISTS `log` (
+  `time` datetime NOT NULL,
+  `resource_id` int(11) NOT NULL,
+  `task_id` int(11) NOT NULL,
+  `details` varchar(32) NOT NULL DEFAULT '',
+  `type` enum('estimate','move','update') NOT NULL,
+  PRIMARY KEY (`time`,`resource_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------

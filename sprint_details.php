@@ -46,6 +46,9 @@ $(document).ready(function() {
 		source: "names.php",
 		minLength: 1
 		});	
+	$(".chartOption").change( function (event) {
+		redrawCharts( 'burndown', 'burnup', $('#realdates').attr('checked'), $('#edwardian').attr('checked'));
+		});
 	});
 
 </script>
@@ -73,6 +76,8 @@ $(document).ready(function() {
 							<li><a href="#tabs-3">Availability</a></li>
 						</ul>
 						<div id="tabs-1" >
+						<input type='checkbox' class='chartOption' value='0' name='edwardian' id='edwardian' value='edwardian' checked/><label for='edwardian'>Edwardian </label>
+						<input type='checkbox' class='chartOption' value='0' name='realdates' id='realdates' value='realdates'/><label for='realdates'>Use real dates</label>
 						<div id="graphwrapper">
 							<h3 class="categoryHeader">
 								<a href="#">Burn Down</a>
