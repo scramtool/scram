@@ -4,7 +4,7 @@
  * 
  */
 
-$sprint_id = 1;
+$sprint_id = 2;
 if (isset( $_GET['sprint_id']))
 {
 	$sprint_id = $_GET['sprint_id'];

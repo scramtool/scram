@@ -40,7 +40,7 @@ function get_burndown_grid_query( $sprint_id, $task_id = 0)
 	            (
 	            select * from (select distinct( date)
 	            from report join task on task.task_id = report.task_id where task.sprint_id = $sprint_id) as dates,
-	                    (select task.task_id from task where sprint_id = 1) as tasks order by date, task_id
+	                    (select task.task_id from task where sprint_id = $sprint_id) as tasks order by date, task_id
 	             ) as grid
 	             on report.task_id = grid.task_id and report.date <= grid.date group by grid.task_id, grid.date
 	      ) as grid_reports
