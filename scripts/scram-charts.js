@@ -46,7 +46,7 @@ function getWeekdays( sprint)
 }
 
 /**
- * Draw a chart with two lines.
+ * Draw a chart with three lines.
  * This function is called to draw both the burn-up and the burn-down charts
  * @param element
  * @param burnDownSeries
@@ -57,6 +57,20 @@ function drawMultiLine( element, burnDownSeries, progressionSeries, availability
 	$('#' + element).empty();
 	var chart = new Charts.LineChart( element, {show_grid: true});
 
+	// add a progression line. This is typicall a line that runs
+	// through the complete timeframe of the chart (from left to right).
+	chart.add_line( {
+		data: progressionSeries,
+		options: {
+			line_color: "#00aadd",
+			fill_area: false
+		}
+	});
+
+	// add a burn down (or -up) line. This line runs from the start of the 
+	// sprint to the current date.
+	// the order is important, because we want this line on top of the progression
+	// line.
 	chart.add_line({
 		data: burnDownSeries,
 		options: {
@@ -66,14 +80,7 @@ function drawMultiLine( element, burnDownSeries, progressionSeries, availability
 		}
 	});
 
-	chart.add_line( {
-		data: progressionSeries,
-		options: {
-			line_color: "#00aadd",
-			fill_area: false
-		}
-	});
-
+	// add a thinner line that indicates the available resources.
 	chart.add_line( {
 		data: availabilitySeries,
 		options: {
