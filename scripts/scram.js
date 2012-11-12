@@ -174,7 +174,7 @@ function submitEstimate( )
  */
 function submitText( value, settings)
 {
-     console.log(settings.submitdata.task_id);
+     //console.log(settings.submitdata.task_id);
      $.getJSON( changeTextUrl + '?id=' + settings.submitdata.task_id + '&text=' + encodeURIComponent(value),
 			function (taskText)
 			{
@@ -301,6 +301,8 @@ function addPersonToList( person, listName)
 function makeTaskMarkup( task, isInWorkList)
 {
 	var reported_time;
+	var note_class = "yellowNote";
+	
 	if (!isInWorkList || isOnSameDay( Date.parse(task.report_date), new Date()))
 	{
 		reported_time = '<div class="clickable estimate frozen">' + task.estimate + '</div><div>&nbsp;&nbsp;&nbsp;</div><div>' + task.name+ '</div>';
@@ -315,7 +317,21 @@ function makeTaskMarkup( task, isInWorkList)
 			' <button class="submitReportButton">Submit Todays numbers</button>'+
 			'</form>';
 	}
-	html = '<div class="yellowNote"><div class="taskNumbers">'+ reported_time + '<div style="float:right"><input type="checkbox" class="taskSelect" id="selected-task-' + task.task_id + '" /><button class="zoomTaskButton" id="zoom-task-'+ task.task_id +'" /></div><br style="clear:both" /></div><div id="description-for-' + task.task_id + '" class="taskDetails">'+ task.description  +'</div></div>';
+	
+	if (task.resource_id == member_id)
+	{
+		note_class = "greenNote";
+	}
+	else
+	{
+		note_class ;
+	}
+	html = '<div class="' + note_class + '"><div class="taskNumbers">'
+		+ reported_time + '<div style="float:right"><input type="checkbox" class="taskSelect" id="selected-task-' 
+		+ task.task_id + '" /><button class="zoomTaskButton" id="zoom-task-'
+		+ task.task_id +'" /></div><br style="clear:both" /></div><div id="description-for-' 
+		+ task.task_id + '" class="taskDetails">' + task.description  +'</div></div>';
+	
 	return html;
 }
 
