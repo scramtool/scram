@@ -66,7 +66,7 @@ body {
 
 .taskNumbers
 {
-	background: none repeat scroll 0 0 #DDCC00;
+	background: none repeat scroll 0 0 #A0A0A0;
 	text-align: center; 
 	font-size: 120%;
 	overflow: hidden;
@@ -94,6 +94,20 @@ body {
 	border-radius: 0px 0px 6px 0px;
 	background-color: #eeee00;
 	border: 1px solid #CCCC00;
+	box-shadow: 3px 3px 10px #cccccc;
+	padding: 0 px;
+	margin: 3px; 
+	float: left; 
+	width: 180px; 
+	min-height: 100px;
+	height: auto; 
+}
+
+.greenNote
+{
+	border-radius: 0px 0px 6px 0px;
+	background-color: #C0ff9c;
+	border: 1px solid #60BB40;
 	box-shadow: 3px 3px 10px #cccccc;
 	padding: 0 px;
 	margin: 3px; 
