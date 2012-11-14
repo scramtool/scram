@@ -22,7 +22,7 @@ $(document).ready(function(){
 </script>
 </head>
 <body>
-<div id='taskForm' >
+<div id='taskForm' class='yellowNote'>
 <div class='taskNumbers'><div id='taskEstimate' class='frozen estimate'><?=$task['estimate']?></div><div id='taskOwner'><?=$task['name']?></div></div>
 <div class='smallChart' style="width:400px;height:200px" id='taskBurnDown' ></div>
 <div class='taskDescription' id='description'><?=$task['description']?></div>
