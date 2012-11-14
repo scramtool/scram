@@ -24,8 +24,8 @@ $(document).ready(function(){
 <body>
 <div id='taskForm' class='yellowNote'>
 <div class='taskNumbers'><div id='taskEstimate' class='frozen estimate'><?=$task['estimate']?></div><div id='taskOwner'><?=$task['name']?></div></div>
-<div class='smallChart' style="width:400px;height:200px" id='taskBurnDown' ></div>
 <div class='taskDescription' id='description'><?=$task['description']?></div>
+<div class='smallChart' style="width:400px;height:200px" id='taskBurnDown' ></div>
 <div class='taskStory' id='story'><?=$task_html?></div>
 <br style="clear:both" />
 </div>

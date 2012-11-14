@@ -16,8 +16,8 @@ require_once 'get_sprint_id.inc.php';
 <script type="text/javascript" src="scripts/jquery.numeric.js"/></script>
 <script type="text/javascript" src="scripts/scram.js"></script>
 <script type="text/javascript" src="scripts/date.js"></script>
-<script type="text/javascript" src="scripts/raphael.js"></script>
-<script type="text/javascript" src="scripts/charts.js"></script>
+<script type="text/javascript" src="scripts/raphael-min.js"></script>
+<script type="text/javascript" src="scripts/charts.min.js"></script>
 <script type="text/javascript" src="scripts/scram-charts.js"></script>
 
 
