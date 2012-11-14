@@ -100,20 +100,21 @@ body {
 	float: left; 
 	width: 180px; 
 	min-height: 100px;
-	height: auto; 
+	overflow: hidden; 
 }
 
 .greenNote
 {
 	border-radius: 0px 0px 6px 0px;
-	background-color: #C0ff9c;
+	background-color: #b0df4c;
 	border: 1px solid #60BB40;
 	box-shadow: 3px 3px 10px #cccccc;
 	padding: 0 px;
 	margin: 3px; 
 	float: left; 
 	width: 180px; 
-	height: 100px; 
+	min-height: 100px;
+	overflow: hidden; 
 }
 
 

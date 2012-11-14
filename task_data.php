@@ -76,8 +76,8 @@ function handle_move( $task_id, $status, $owner)
 		print_single_task($task_id);
 	}
 
-	// if the new status is 'forwarded', automatically add a report setting the tasks new estimate to 0
-	if ($status == 'forwarded')
+	// if the new status is 'forwarded' or 'done', automatically add a report setting the tasks new estimate to 0
+	if ($status == 'forwarded' || $status == 'done')
 	{
 		$report_query = 
 			"INSERT INTO report(task_id, resource_id, date, reason, burnt, estimate) ".

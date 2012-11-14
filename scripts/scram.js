@@ -235,7 +235,7 @@ function showTaskDialog()
  */
 function setAdvancedUIBehaviour()
 {
-	$(".submitReportButton").button( {icons: {primary: "ui-icon-gear"}, text:false}).click( submitEstimate);
+	$(".submitReportButton").button( {icons: {primary: "ui-icon-disk"}, text:false}).click( submitEstimate);
 	$(".zoomTaskButton").button( {icons: {primary: "ui-icon-extlink"}, text:false}).click( showTaskDialog);
 	$('.taskDetails').each( makeEditable); 
 	$(".positive-integer").numeric({ decimal: false, negative: false }, function() { 
@@ -381,7 +381,8 @@ function createTaskListItem( task)
 			{
 				'class': 'taskNote', 
 				'id':'container-for-' + task.task_id, 
-				'html':makeTaskMarkup( task, worksOnTask( member_id, task))
+				'html':makeTaskMarkup( task, worksOnTask( member_id, task) || 
+						                     worksOnTBVTask( member_id, task) )
 			}
 		);
 }
@@ -467,7 +468,21 @@ function noteReceived( event, ui)
  */
 function worksOnTask( resourceId, taskInfo)
 {
-	return taskInfo.resource_id == resourceId && (taskInfo.status == 'inProgress');
+	return taskInfo.resource_id == resourceId && 
+	    (taskInfo.status == 'inProgress');
+}
+
+/**
+ * Does the person with the given resourceId currently work on this task
+ * which has status 'to be verified'?
+ * @param resourceId
+ * @param taskInfo
+ * @returns {Boolean}
+ */
+function worksOnTBVTask( resourceId, taskInfo)
+{
+	return taskInfo.resource_id == resourceId && 
+	    (taskInfo.status == 'toBeVerified');
 }
 
 
