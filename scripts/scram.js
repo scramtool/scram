@@ -301,7 +301,7 @@ function addPersonToList( person, listName)
 function makeTaskMarkup( task, isInWorkList)
 {
 	var reported_time;
-	var note_class = "yellowNote";
+	var note_class = "note yellowNote";
 	
 	if (!isInWorkList || isOnSameDay( Date.parse(task.report_date), new Date()))
 	{
@@ -320,7 +320,7 @@ function makeTaskMarkup( task, isInWorkList)
 	
 	if (task.resource_id == member_id)
 	{
-		note_class = "greenNote";
+		note_class = "note greenNote";
 	}
 	else
 	{

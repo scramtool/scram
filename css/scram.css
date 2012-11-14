@@ -72,6 +72,16 @@ body {
 	overflow: hidden;
 }
 
+.yellowNote .taskNumbers
+{
+	background-color: #CCCC7A;
+}
+
+.greenNote .taskNumbers
+{
+	background-color: #B1CCAB;
+}
+
 .taskNumbers form
 {
 	margin: 2px 0px 2px 0px;
@@ -83,17 +93,15 @@ body {
 	float:left;
 }
 
-
-#myTasks .yellowNote
+#myTasks .note
 {
 	width: 240px;
 }
 
-.yellowNote
+.note
 {
 	border-radius: 0px 0px 6px 0px;
-	background-color: #eeee00;
-	border: 1px solid #CCCC00;
+	border: 1px solid;
 	box-shadow: 3px 3px 10px #cccccc;
 	padding: 0 px;
 	margin: 3px; 
@@ -103,18 +111,16 @@ body {
 	overflow: hidden; 
 }
 
+.yellowNote
+{
+	background-color: #FDFD96; 
+	border-color: #CCCC7A;
+}
+
 .greenNote
 {
-	border-radius: 0px 0px 6px 0px;
-	background-color: #b0df4c;
-	border: 1px solid #60BB40;
-	box-shadow: 3px 3px 10px #cccccc;
-	padding: 0 px;
-	margin: 3px; 
-	float: left; 
-	width: 180px; 
-	min-height: 100px;
-	overflow: hidden; 
+	background-color: #DDFFD6;
+	border-color: #B1CCAB;
 }
 
 
@@ -149,10 +155,19 @@ body {
 
 .frozen
 {
-	background-color: #eeee00;
 	margin:1px;
 	width: 22px;
 	height: 22px;
+}
+
+.greenNote .frozen
+{
+	background-color: #DDFFD6;
+}
+
+.yellowNote .frozen
+{
+	background-color: #FDFD96; 
 }
 
 .taskDetails
