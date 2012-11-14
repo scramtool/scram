@@ -1,4 +1,5 @@
 <?php
+
 require_once 'connect_db.inc.php';
 require_once 'utilities.inc.php';
 require_once 'task_data.inc.php';
@@ -52,6 +53,14 @@ function handle_report( $task_id, $estimate, $spent)
 
 }
 
+/**
+ * Handle a 'move' request. 
+ * 
+ * The task was moved from one box to another, update the tasks status in the database.
+ * @param unknown $task_id
+ * @param unknown $status The new status of the task
+ * @param unknown $owner The person performing the move.
+ */
 function handle_move( $task_id, $status, $owner)
 {
 	global $database;
@@ -71,19 +80,22 @@ function handle_move( $task_id, $status, $owner)
 	$move_query = "UPDATE task SET status='$status' $owner_update WHERE task_id = $task_id";
 	$success = $database->exec($move_query);
 	
-	if ($success)
-	{
-		print_single_task($task_id);
-	}
-
 	// if the new status is 'forwarded' or 'done', automatically add a report setting the tasks new estimate to 0
 	if ($status == 'forwarded' || $status == 'done')
 	{
+	    // if the task was moved to the 'done' box, we assume work has been done. 
+	    // TODO: maybe actually use the current time left on the task for the work done indicator.
+	    $report_reason = ($status=='forwarded')?'forward':'work';
 		$report_query = 
 			"INSERT INTO report(task_id, resource_id, date, reason, burnt, estimate) ".
-			"SELECT $task_id, resource_id, NOW(), 'forward', 0, 0 FROM task WHERE task_id = $task_id";
+			"SELECT $task_id, resource_id, NOW(), '$report_reason', 0, 0 FROM task WHERE task_id = $task_id";
 			
 		$database->exec( $report_query);
+	}
+
+	if ($success)
+	{
+	    print_single_task($task_id);
 	}
 	
 	$log = new Log( $database);
