@@ -1,4 +1,12 @@
 <?php
+//
+//  Copyright (C) 2012 Danny Havenith
+//
+//  Distributed under the Boost Software License, Version 1.0. (See
+//  accompanying file LICENSE_1_0.txt or copy at
+//  http://www.boost.org/LICENSE_1_0.txt)
+//
+
 /**
  * After including this page, the global variable $member_id will be set.
  * If the name of the team member cannot be determined by looking at either the get-variables or cookies, this 
