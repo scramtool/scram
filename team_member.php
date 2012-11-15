@@ -34,6 +34,9 @@ $(document).ready(function() {
 		        });	
      $(".positive-integer").numeric({ decimal: false, negative: false }, function() { alert("Positive integers only"); this.value = ""; this.focus(); });
 	loadTasks( sprint_id, refreshTaskUi);
+	$("#showAll").change( function (event) {
+	         filterTasks($('#showAll').attr('checked'));
+		});
 	});
 </script>
 <title>Task overview for <?=$member_name?></title>
@@ -43,15 +46,20 @@ $(document).ready(function() {
     <div class="colright">
         <div class="col1wrap">
 			<div class="mainColumn" id="tasks">
-				<div class="header">
-					<h1>Tasks for <?=$member_name?></h1>
+				<h3 class="categoryHeader">
+					<a href="#">Team member details</a>
+				</h3>
+				<div class="categoryContent detailsBox" id="teamMemberDetails">
+				    <h2>Tasks for <?=$member_name?></h2>
+				    <input type='checkbox' value='1' name='showAll' id='showAll' value='showAll' checked/><label for='showAll'>Show all</label>
 				</div>
-			    <h3 class="categoryHeader"><a href="#">My Tasks</a></h3>
+
+				<h3 class="categoryHeader"><a href="#">My Tasks in Progress</a></h3>
 			    <div class="categoryContent"><ul id="myTasks" class="taskList"></ul><br style="clear:both;"/></div>
 			    <h3 class="categoryHeader"><a href="#">To Do</a></h3>
 			    <div class="categoryContent"><ul id="toDoList" class="taskList"></ul><br style="clear:both;"/></div>
-			    <h3 class="categoryHeader"><a href="#">In Progress</a></h3>
-			    <div class="categoryContent"><ul id="inProgressList" class="taskList"></ul><br style="clear:both;"/></div>
+			    <h3 class="categoryHeader inProgressBox"><a href="#">In Progress</a></h3>
+			    <div class="categoryContent inProgressBox"><ul id="inProgressList" class="taskList"></ul><br style="clear:both;"/></div>
 			    <h3 class="categoryHeader"><a href="#">To be Verified</a></h3>
 			    <div class="categoryContent"><ul id="toBeVerifiedList" class="taskList"></ul><br style="clear:both;"/></div>
 			    <h3 class="categoryHeader"><a href="#">Done</a></h3>

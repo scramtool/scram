@@ -66,7 +66,7 @@ $(document).ready(function() {
 					<h3 class="categoryHeader">
 						<a href="#">Sprint Details</a>
 					</h3>
-					<div class="categoryContent" id="sprintDetails">
+					<div class="categoryContent detailsBox" id="sprintDetails">
 					</div>
 
 					<div id="tabs">

@@ -31,6 +31,16 @@ function loadTasks( sprint, callback) {
 			});
 }
 
+function filterTasks( showAll)
+{
+	if (showAll) {
+		$('.someoneElses, .inProgressBox').fadeIn( 500);
+	}
+	else {
+		$('.someoneElses, .inProgressBox').fadeOut( 500);
+	}
+}
+
 function loadLogs( sprint, callback)
 {
 	$.getJSON( logUrl + '?sprint_id=' + sprint, callback);
@@ -303,6 +313,7 @@ function makeTaskMarkup( task, isInWorkList)
 	var reported_time;
 	var note_class = "note yellowNote";
 	
+	
 	if (!isInWorkList || isOnSameDay( Date.parse(task.report_date), new Date()))
 	{
 		reported_time = '<div class="clickable estimate frozen">' + task.estimate + '</div><div>&nbsp;&nbsp;&nbsp;</div><div>' + task.name+ '</div>';
@@ -324,8 +335,12 @@ function makeTaskMarkup( task, isInWorkList)
 	}
 	else
 	{
-		note_class ;
+		note_class = "note yellowNote";
+		if (task.name) {
+			note_class = note_class + " someoneElses";
+		}
 	}
+	
 	html = '<div class="' + note_class + '"><div class="taskNumbers">'
 		+ reported_time + '<div style="float:right"><input type="checkbox" class="taskSelect" id="selected-task-' 
 		+ task.task_id + '" /><button class="zoomTaskButton" id="zoom-task-'
