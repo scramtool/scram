@@ -1,0 +1,13 @@
+Scram is yet-another-scrum-tool.
+
+This PHP/MySQL tool aims to relieve the scrum master from the burden of having to maintain spreadsheets 
+with data to create burndown-charts. It does this by enticing team members to fill in their burn-down 
+and burn-up data in an online form. In order to do that, the UI is intended to be as responsive and 
+intuitive as we can get it. jQuery is used extensively to create fast interactions.
+
+This tool does not intend to replace the task board. Instead, the intention is for team members 
+to update their estimates before the daily scrum, so that during the daily scrum people can concentrate
+on stories instead of effort estimates.
+
+This tool is far from finished, set up is manual and labor intensive and much configuration is 
+still hardcoded. 
