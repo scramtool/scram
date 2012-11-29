@@ -83,13 +83,22 @@ function handle_move( $task_id, $status, $owner)
 	// if the new status is 'forwarded' or 'done', automatically add a report setting the tasks new estimate to 0
 	if ($status == 'forwarded' || $status == 'done')
 	{
-	    // if the task was moved to the 'done' box, we assume work has been done. 
-	    // TODO: maybe actually use the current time left on the task for the work done indicator.
-	    $report_reason = ($status=='forwarded')?'forward':'work';
-		$report_query = 
-			"INSERT INTO report(task_id, resource_id, date, reason, burnt, estimate) ".
-			"SELECT $task_id, resource_id, NOW(), '$report_reason', 0, 0 FROM task WHERE task_id = $task_id";
-			
+		$select_query =
+		    "SELECT * FROM report WHERE task_id=" . $task_id . " AND date=CURDATE()";
+		$result = $database->exec($select_query);
+		if (mysql_num_rows($result) > 0)
+		{
+			// Update the existing report for today.
+			$report_query = 
+				"UPDATE report SET estimate=0 WHERE task_id=" . $task_id . " AND date=CURDATE()";
+		}
+		else
+		{
+			// Add a report with estimate set to 0.
+			$report_query = 
+				"INSERT INTO report(task_id, resource_id, date, reason, burnt, estimate) ".
+				"SELECT $task_id, resource_id, NOW(), 'forward', 0, 0 FROM task WHERE task_id = $task_id";
+		}	
 		$database->exec( $report_query);
 	}
 
