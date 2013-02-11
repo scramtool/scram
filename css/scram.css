@@ -214,3 +214,10 @@ float: left;
 width: 100%;
 }
 
+.taskStateSelect
+{
+	position: absolute;
+	visibility: hidden;
+	font-size: 10px;
+}
+

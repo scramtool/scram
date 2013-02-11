@@ -144,7 +144,7 @@ function submitNewTask()
 				function (task)
 				{
 					currentTasks['x'+task.task_id] = task;
-					$("#container-for-task-stub-" + task.placeholder).replaceWith( createTaskListItem( task));
+					$("#container-for-task-stub-" + task.placeholder).replaceWith( createTaskListItem( task, false));
 				});
 	}
 	// clear the form and bring the cursor to the first input.
@@ -169,7 +169,30 @@ function submitEstimate( )
 			function (task)
 			{
 				currentTasks['x'+task.task_id] = task;
-				$("#container-for-" + task.task_id).html( makeTaskMarkup( task, true));
+				$("#container-for-" + task.task_id).html( makeTaskMarkup( task, true, true));
+			});
+	return false;
+}
+
+/**
+ * Submit the new state of a task.
+ * @returns {Boolean}
+ */
+function submitState( )
+{
+	var obj_id = "#" + $(this).attr('id');
+	var new_status = $(obj_id + " option:selected").val();
+	var task_id = obj_id.substring(19);
+	var query = '?action=move&task_id=' + task_id +'&status=' + new_status;
+			
+	$('#description-for-' + task_id).html('<img class="centered" src="images/ajax-loader.gif"/>');
+	$.getJSON( taskListUrl + query,
+			function (task)
+			{
+				currentTasks['x'+task.task_id] = task;
+				$("#container-for-" + task.task_id).html( makeTaskMarkup( task, false, true));
+				$("#container-for-" + task.task_id).prependTo( "#" + new_status + "List");				
+				setAdvancedUIBehaviour();
 			});
 	return false;
 }
@@ -232,6 +255,21 @@ function showTaskDialog()
 	});
 }
 
+function showTaskState()
+{
+	//show-task-state-
+	var task_id = $(this).attr('id').substring(16);
+	var select_id = "#task-state-select-" + task_id;
+	if ($(select_id).css('visibility') == 'hidden')
+	{
+		$(select_id).css("visibility", "visible");
+	}
+	else
+	{
+		$(select_id).css("visibility", "hidden");
+	}
+}
+
 /**
  * Set up advanced ui behaviour. This is behaviour that can't be reached with stylesheets alone and that need some
  * extra javascript to set up. It is safe to call this function multiple times on a page.
@@ -245,8 +283,10 @@ function showTaskDialog()
  */
 function setAdvancedUIBehaviour()
 {
-	$(".submitReportButton").button( {icons: {primary: "ui-icon-disk"}, text:false}).click( submitEstimate);
-	$(".zoomTaskButton").button( {icons: {primary: "ui-icon-extlink"}, text:false}).click( showTaskDialog);
+	$(".submitReportButton").button( {icons: {primary: "ui-icon-disk"}, text:false}).unbind('click').click( submitEstimate);
+	$(".showTaskStateButton").button( {icons: {primary: "ui-icon-arrowthick-1-s"}, text:false}).unbind('click').click(  showTaskState);
+	$(".zoomTaskButton").button( {icons: {primary: "ui-icon-extlink"}, text:false}).unbind('click').click( showTaskDialog);
+	$(".taskStateSelect").change( submitState);
 	$('.taskDetails').each( makeEditable); 
 	$(".positive-integer").numeric({ decimal: false, negative: false }, function() { 
 		alert("Positive integers only"); this.value = ""; this.focus(); 
@@ -308,7 +348,7 @@ function addPersonToList( person, listName)
  * @param isInWorkList Whether the task is displayed in the current work list (this means that a form for estimates will be shown)
  * @returns
  */
-function makeTaskMarkup( task, isInWorkList)
+function makeTaskMarkup( task, isInWorkList, showStatusSelect)
 {
 	var reported_time;
 	var note_class = "note yellowNote";
@@ -342,12 +382,37 @@ function makeTaskMarkup( task, isInWorkList)
 	}
 	
 	html = '<div class="' + note_class + '"><div class="taskNumbers">'
-		+ reported_time + '<div style="float:right"><input type="checkbox" class="taskSelect" id="selected-task-' 
-		+ task.task_id + '" /><button class="zoomTaskButton" id="zoom-task-'
-		+ task.task_id +'" /></div><br style="clear:both" /></div><div id="description-for-' 
+		+ reported_time + '<div style="float:right"><button class="zoomTaskButton" id="zoom-task-'
+		+ task.task_id + '" />';
+		
+	if (showStatusSelect)
+	{
+		html += '<button class="showTaskStateButton" id="show-task-state-'
+		+ task.task_id + '" /><div class="taskStateSelect" id="task-state-select-'
+		+ task.task_id + '"><select style="background-color: #b0b0e4;">'
+		+ makeStatusOption(task, "toDo")
+		+ makeStatusOption(task, "inProgress")
+		+ makeStatusOption(task, "toBeVerified")
+		+ makeStatusOption(task, "done")
+		+ makeStatusOption(task, "forwarded")
+		+ '</select></div>'
+	}
+	
+	html += '</div><br style="clear:both" /></div><div id="description-for-' 
 		+ task.task_id + '" class="taskDetails">' + task.description  +'</div></div>';
 	
 	return html;
+}
+
+/**
+ * Create a select option for the task status. But don't show the option
+ * if the current status euqls the option value.
+ * @param task, option
+ * @returns
+ */
+function makeStatusOption( task, option)
+{
+	return '<option value="' + option + '" ' + (task.status==option?"selected":"") + '>' + option + '</option>';
 }
 
 /**
@@ -381,7 +446,7 @@ function makePersonMarkup( person, listName)
  */
 function addTaskToList( task, listName)
 {
-	var item = createTaskListItem( task);
+	var item = createTaskListItem( task, listName != '#sprintTasks');
 	item.appendTo( listName);
 }
 
@@ -390,14 +455,15 @@ function addTaskToList( task, listName)
  * @param task
  * @returns
  */
-function createTaskListItem( task)
+function createTaskListItem( task, showStatusSelect)
 {
 	return $('<li/>', 
 			{
 				'class': 'taskNote', 
 				'id':'container-for-' + task.task_id, 
 				'html':makeTaskMarkup( task, worksOnTask( member_id, task) || 
-						                     worksOnTBVTask( member_id, task) )
+						                     worksOnTBVTask( member_id, task),
+						                     showStatusSelect )
 			}
 		);
 }
@@ -469,7 +535,7 @@ function noteReceived( event, ui)
 				function (task)
 				{
 					currentTasks['x'+task.task_id] = task;
-					$("#container-for-" + task.task_id).html( makeTaskMarkup( task, to_mytasks));
+					$("#container-for-" + task.task_id).html( makeTaskMarkup( task, to_mytasks, true));
 					setAdvancedUIBehaviour();
 				});
 	}
