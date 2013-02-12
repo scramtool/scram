@@ -27,6 +27,6 @@ JOIN report ON task_report.task_id = report.task_id AND task_report.report_date 
 RIGHT OUTER JOIN task ON task.task_id = report.task_id
 LEFT OUTER JOIN resource ON task.resource_id = resource.resource_id
 	$task_restriction
-ORDER BY report.description DESC
+ORDER BY task.description ASC
 EOT;
 }
