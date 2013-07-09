@@ -39,7 +39,9 @@ if (isset( $_GET['member_name']))
 </head>
 <body>
 <h1>Please tell me who you are</h1>
-I need to know who you are. Please give your name here. The name you use here will show on each task that is allocated to you.
+Please give your name here. The name you use here will show on each task that is allocated to you. There is no need for formal names, just use
+the name that you are known by in the team. The name needs to be unique within your team.
+
 This page should be shown only once. The name you provide here will be remembered.
 <div id="dialog-form" title="Create new user">
 <form method="get">

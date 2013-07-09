@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 3.4.10.1deb1
+-- version 3.5.2.2
 -- http://www.phpmyadmin.net
 --
--- Host: localhost
--- Generation Time: Oct 01, 2012 at 03:59 AM
--- Server version: 5.5.24
--- PHP Version: 5.3.10-1ubuntu3.4
+-- Host: 127.0.0.1
+-- Generation Time: Jul 09, 2013 at 04:12 PM
+-- Server version: 5.5.27
+-- PHP Version: 5.4.7
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -34,6 +34,17 @@ CREATE TABLE IF NOT EXISTS `availability` (
   PRIMARY KEY (`sprint_id`,`resource_id`,`date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `extended_log`
+--
+CREATE TABLE IF NOT EXISTS `extended_log` (
+`type` enum('estimate','move','update')
+,`details` varchar(32)
+,`name` varchar(50)
+,`description` varchar(64)
+);
 -- --------------------------------------------------------
 
 --
@@ -74,7 +85,7 @@ CREATE TABLE IF NOT EXISTS `resource` (
   `resource_id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,
   PRIMARY KEY (`resource_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=9 ;
 
 -- --------------------------------------------------------
 
@@ -88,7 +99,7 @@ CREATE TABLE IF NOT EXISTS `sprint` (
   `start_date` date NOT NULL,
   `end_date` date NOT NULL,
   PRIMARY KEY (`sprint_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=21 ;
 
 -- --------------------------------------------------------
 
@@ -102,9 +113,19 @@ CREATE TABLE IF NOT EXISTS `task` (
   `description` varchar(64) NOT NULL,
   `status` enum('toDo','inProgress','toBeVerified','done','forwarded') NOT NULL DEFAULT 'toDo',
   `resource_id` int(11) NOT NULL,
+  `story` text NOT NULL,
   PRIMARY KEY (`task_id`),
   KEY `sprint_id` (`sprint_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=50 ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `extended_log`
+--
+DROP TABLE IF EXISTS `extended_log`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `extended_log` AS select `log`.`type` AS `type`,`log`.`details` AS `details`,`resource`.`name` AS `name`,`task`.`description` AS `description` from ((`log` left join `resource` on((`resource`.`resource_id` = `log`.`resource_id`))) join `task` on((`log`.`task_id` = `task`.`task_id`)));
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
