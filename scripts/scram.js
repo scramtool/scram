@@ -1,6 +1,11 @@
-/**
- * 
- */
+//
+//  Copyright (C) 2012 Danny Havenith
+//
+//  Distributed under the Boost Software License, Version 1.0. (See
+//  accompanying file LICENSE_1_0.txt or copy at
+//  http://www.boost.org/LICENSE_1_0.txt)
+//
+
 var taskListUrl = 'task_data.php';
 var peopleListUrl = 'people_data.php';
 var changeTextUrl = 'change_task_text.php';

@@ -1,0 +1,1 @@
+ajax-loader.gif generated from http://ajaxload.info/

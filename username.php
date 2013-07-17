@@ -1,4 +1,12 @@
 <?php
+//
+//  Copyright (C) 2012 Danny Havenith
+//
+//  Distributed under the Boost Software License, Version 1.0. (See
+//  accompanying file LICENSE_1_0.txt or copy at
+//  http://www.boost.org/LICENSE_1_0.txt)
+//
+
 /**
  * obtain a user name.
  * Other pages will redirect to this page if the user name is not known.
