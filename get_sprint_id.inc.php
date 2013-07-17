@@ -12,7 +12,7 @@
  * 
  */
 
-$sprint_id = 3;
+$sprint_id = 20;
 if (isset( $_GET['sprint_id']))
 {
 	$sprint_id = $_GET['sprint_id'];
