@@ -36,6 +36,25 @@ function loadTasks( sprint, callback) {
 			});
 }
 
+function loadTaskTable( sprint_id, table_name) {
+	$('#' + table_name).dataTable( {
+		"bProcessing": true,
+		"sScrollY": 600,
+		"bScrollCollapse": true,
+		"bJQueryUI": true,
+		"bPaginate": false,
+		"sAjaxSource": taskListUrl + '?action=table&sprint_id=' + sprint_id,
+		"aoColumnDefs": [
+		                 { "bVisible": false, "aTargets": [ 0,1,4,5 ] },
+		                 { "sWidth":"10%", "aTargets": [ -1 ] }
+		               ],
+		
+	} );	
+	$(window).bind('resize', function () {
+		$('#' + table_name).dataTable().fnAdjustColumnSizing();
+	  } );
+}
+
 function filterTasks( showAll)
 {
 	if (showAll) {
@@ -132,29 +151,23 @@ function submitNewTask()
 	if (!task.estimate) task.estimate = 8;
 	if (task.description.length != 0)
 	{
-		query += '&placeholder=' + placeholderid;
 		query += '&sprint_id=' + sprint_id;
-		
-		task.name = "Nobody";
-		var item = 
-			$('<li/>', 
-				{
-					'class': 'taskNote', 
-					'id':'container-for-task-stub-' + placeholderid, 
-					'html':makeTaskPlaceholder(task)
-				}
-			);
-		item.prependTo( '#sprintTasks');
+
 		$.getJSON( taskListUrl + '?action=add' + query,
 				function (task)
 				{
-					currentTasks['x'+task.task_id] = task;
-					$("#container-for-task-stub-" + task.placeholder).replaceWith( createTaskListItem( task, false));
+					var table = $('#taskTable').dataTable();
+					table.fnAddData([
+					                 task.task_id, task.sprint_id, 
+					                 task.description, task.status,
+					                 task.resource_id, "",task.name,
+					                 0, task.estimate, task.estimate, task.estimate
+					                 ]);
 				});
 	}
 	// clear the form and bring the cursor to the first input.
-	$('.categoryTopLine form input').val("");
-	$('.categoryTopLine form #estimate').val("8");
+	$('form input').val("");
+	$('form #estimate').val("8");
 	$('.firstToFocus').focus();
 	
 	return false;

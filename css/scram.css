@@ -52,6 +52,10 @@ body {
 	float:right;
 }
 
+#taskTable_wrapper {
+	margin-top: 10px;
+}
+
 .categoryHeader
 {
 	background: url("smoothness/images/ui-bg_glass_75_e6e6e6_1x400.png") repeat-x scroll 50% 50% #0078AE;
@@ -171,6 +175,16 @@ body {
 .yellowNote .frozen
 {
 	background-color: #FDFD96; 
+}
+
+.even > td
+{
+	background-color: #FDFD96; 
+}
+
+.odd > td
+{
+	background-color: #FfFfb6; 
 }
 
 .taskDetails

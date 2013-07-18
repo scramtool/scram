@@ -40,6 +40,18 @@ function print_task_data( $sprint_id)
 	print json_encode($tasks);
 }
 
+function print_task_table_data( $sprint_id)
+{
+    global $database;
+    $headers = array();
+    $tasks = array();
+    $result = array();
+    
+    $database->get_result_table( get_task_table_query($sprint_id), $headers, $tasks);
+    $result['aaData'] = array_map( "array_values", $tasks);
+    print json_encode($result);
+}
+
 function print_single_task( $task_id)
 {
 	global $database;
@@ -91,6 +103,7 @@ function handle_move( $task_id, $status, $owner)
 	// if the new status is 'forwarded' or 'done', automatically add a report setting the tasks new estimate to 0
 	if ($status == 'forwarded' || $status == 'done')
 	{
+	    $reason = ($status == 'forwarded')?'forward':'estimate';
 		$select_query =
 		    "SELECT * FROM report WHERE task_id=" . $task_id . " AND date=CURDATE()";
 		$result = $database->exec($select_query);
@@ -98,14 +111,14 @@ function handle_move( $task_id, $status, $owner)
 		{
 			// Update the existing report for today.
 			$report_query = 
-				"UPDATE report SET estimate=0 WHERE task_id=" . $task_id . " AND date=CURDATE()";
+				"UPDATE report SET estimate=0, reason='$reason' WHERE task_id=" . $task_id . " AND date=CURDATE()";
 		}
 		else
 		{
 			// Add a report with estimate set to 0.
 			$report_query = 
 				"INSERT INTO report(task_id, resource_id, date, reason, burnt, estimate) ".
-				"SELECT $task_id, resource_id, NOW(), 'forward', 0, 0 FROM task WHERE task_id = $task_id";
+				"SELECT $task_id, resource_id, NOW(), '$reason', 0, 0 FROM task WHERE task_id = $task_id";
 		}	
 		$database->exec( $report_query);
 	}
@@ -167,16 +180,20 @@ function handle_add( $arguments)
 
 
 // START OF SCRIPT
+if (isset( $_GET['sprint_id']))
+{
+    $sprint_id = $_GET['sprint_id'];
+}
+
 if (isset($_GET['action']))
 {
-	$action = $_GET['action'];
-	if ($action == 'report')
+	switch ($_GET['action'])
 	{
+	case 'report':
 		make_global( $_GET, Array('task_id', 'estimate', 'spent'));
 		handle_report($task_id, $estimate, $spent);
-	}
-	elseif ( $action == 'move')
-	{
+		break;
+	case 'move':
 		make_global( $_GET, Array('task_id', 'status', 'owner'));
 
 		// Yesteryear, I could just give an undefined variable as an argument to a function
@@ -190,18 +207,16 @@ if (isset($_GET['action']))
 		{
 			handle_move( $task_id, $status, null);
 		}
-	}
-	elseif ($action == 'add')
-	{
+		break;
+	case 'add':
 		handle_add( $_GET);
+		break;
+	case 'table':
+	    print_task_table_data($sprint_id);
+	    break;
 	}
-	
 }
 else 
 {
-	if (isset( $_GET['sprint_id']))
-	{
-		$sprint_id = $_GET['sprint_id'];
 		print_task_data( $sprint_id);
-	}
 }

@@ -20,6 +20,8 @@ require_once 'get_sprint_id.inc.php';
 <script type="text/javascript" src="scripts/jquery-ui-1.8.20.custom.min.js" ></script>
 <script type="text/javascript" src="scripts/jquery.jeditable.mini.js" ></script>
 <script type="text/javascript" src="scripts/jquery.numeric.js" ></script>
+<script type="text/javascript" src="scripts/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="scripts/ColReorderWithResize.js"></script>
 <script type="text/javascript" src="scripts/raphael-min.js"></script>
 <script type="text/javascript" src="scripts/charts.min.js"></script>
 <script type="text/javascript" src="scripts/scram.js"></script>
@@ -43,9 +45,18 @@ $(document).ready(function() {
 	        cache: false
 	        });	
 	loadSprintDetails( sprint_id, refreshSprintDetails);
-	$( "#tabs" ).tabs();
 	loadCharts( sprint_id, 'burndown', 'burnup');
-	loadTasks( sprint_id, refreshSprintTasks);
+	//loadTasks( sprint_id, refreshSprintTasks);
+	loadTaskTable( sprint_id, 'taskTable');
+	// hack: we need to explicitly resize column headers when the details tab is shown.
+	$( "#tabs" ).tabs({
+		"show": function(event, ui) {
+			var oTable = $('#taskTable').dataTable();
+			if ( oTable.length > 0 ) {
+				oTable.fnAdjustColumnSizing();
+			}	
+		}
+    });
 	loadPeople( sprint_id, refreshSprintPeople);
 	loadAvailability( sprint_id, function ( table) { createAvailabilityTable( sprint_id, 'tabs-3', table);});
 	$(".newTaskButton").button( {icons: {primary: "ui-icon-plus"}, text:false}).click( submitNewTask);
@@ -113,7 +124,7 @@ $(document).ready(function() {
 							<h3 class="categoryHeader">
 								<a href="#">Sprint Tasks</a>
 							</h3>
-							<div class="categoryTopLine">
+							<div class="categoryContent">
 								<form>
 									New task: 
 									<label for="description">Description:&nbsp;</label>
@@ -131,10 +142,25 @@ $(document).ready(function() {
 									<button class="newTaskButton">Submit a new task</button>
 								</form>
 							</div>
-							<div class="categoryContent">
-								<div id="sprintTasks"></div>
-								<br style="clear: both;" />
-							</div>
+                                <table cellpadding="0" cellspacing="0" border="0"  class="taskTable" id="taskTable">
+                                	<thead>
+                                		<tr>
+                                			<th width="0%">ID</th>
+                                			<th width="0%">Sprint ID</th>
+                                			<th width="40%">Description</th>
+                                			<th width="20%">Status</th>
+                                			<th width="0%">Resource id</th>
+                                			<th width="0%">Story</th>
+                                			<th width="20%">Who</th>
+                                			<th width="5%">Spent</th>
+                                			<th width="5%">Remaining</th>
+                                			<th width="5%">Initial</th>
+                                			<th width="5%">Current</th>
+                                		</tr>
+                                	</thead>
+                                	<tbody>
+                                	</tbody>
+                                </table>
 						</div>
 						<div id="tabs-3" style="overflow:scroll"></div>
 					</div>

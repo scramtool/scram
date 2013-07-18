@@ -15,12 +15,12 @@ function get_task_query( $sprint_id, $task_id = -1)
 	if ($task_id > 0)
 	{
 		$task_restriction = "WHERE task.task_id = $task_id";
-		$report_restriction = "WHERE report.task_id = $task_id";
+		$report_restriction = "WHERE report.task_id = $task_id AND report.reason!='forward'";
 	}
 	else
 	{
 		$task_restriction = "WHERE task.sprint_id = $sprint_id";
-		$report_restriction = "WHERE sprint_id =$sprint_id";
+		$report_restriction = "WHERE sprint_id =$sprint_id  AND report.reason!='forward'";
 	}
 	return <<<EOT
 SELECT task.* , resource.name, report.estimate, DATE_FORMAT(report_date, "%Y-%m-%d") as report_date
@@ -36,5 +36,30 @@ RIGHT OUTER JOIN task ON task.task_id = report.task_id
 LEFT OUTER JOIN resource ON task.resource_id = resource.resource_id
 	$task_restriction
 ORDER BY task.description ASC
+EOT;
+}
+
+/**
+ * return SQL text for a query that fetches enough information about tasks of a given sprint to put 
+ * in a task table.
+ * @param unknown $sprint_id
+ * @return string
+ */
+function get_task_table_query( $sprint_id)
+{
+    return <<<EOT
+SELECT task. * , resource.name AS `who` , reports.total_burnt, last_report.estimate AS remaining, first_report.estimate AS initial_estimate, last_report.estimate + reports.total_burnt AS current_size
+FROM `task`
+LEFT OUTER JOIN (
+    SELECT task_id, min( date ) AS `first` , max( date ) AS `last` , sum( burnt ) AS total_burnt
+    FROM report
+    WHERE report.reason != 'forward'
+    GROUP BY task_id
+) AS reports ON task.task_id = reports.task_id
+LEFT OUTER JOIN report AS first_report ON first_report.date = `first` AND first_report.task_id = task.task_id
+LEFT OUTER JOIN report AS last_report ON last_report.date = last AND last_report.task_id = task.task_id
+JOIN resource ON task.resource_id = resource.resource_id
+WHERE task.sprint_id = $sprint_id
+ORDER BY `task`.`status` ASC
 EOT;
 }
