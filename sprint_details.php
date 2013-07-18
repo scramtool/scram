@@ -66,7 +66,7 @@ $(document).ready(function() {
 		minLength: 1
 		});	
 	$(".chartOption").change( function (event) {
-		redrawCharts( 'burndown', 'burnup', $('#realdates').attr('checked'), $('#edwardian').attr('checked'));
+		redrawCharts( 'burndown', 'burnup', $('#realdates').prop('checked'), $('#edwardian').prop('checked'));
 		});
 	});
 

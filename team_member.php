@@ -37,7 +37,7 @@ $(document).ready(function() {
      $(".positive-integer").numeric({ decimal: false, negative: false }, function() { alert("Positive integers only"); this.value = ""; this.focus(); });
 	loadTasks( sprint_id, refreshTaskUi);
 	$("#showAll").change( function (event) {
-	         filterTasks($('#showAll').attr('checked'));
+	         filterTasks($('#showAll').prop('checked'));
 		});
 	});
 </script>
