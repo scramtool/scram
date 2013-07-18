@@ -39,16 +39,16 @@ function loadTasks( sprint, callback) {
 function loadTaskTable( sprint_id, table_name) {
 	$('#' + table_name).dataTable( {
 		"bProcessing": true,
-		"sScrollY": 600,
-		"bScrollCollapse": true,
+		"sScrollY": 400,
+//		"bScrollCollapse": true,
 		"bJQueryUI": true,
 		"bPaginate": false,
+		"bAutoWidth":true,
 		"sAjaxSource": taskListUrl + '?action=table&sprint_id=' + sprint_id,
 		"aoColumnDefs": [
 		                 { "bVisible": false, "aTargets": [ 0,1,4,5 ] },
 		                 { "sWidth":"10%", "aTargets": [ -1 ] }
-		               ],
-		
+		               ]
 	} );	
 	$(window).bind('resize', function () {
 		$('#' + table_name).dataTable().fnAdjustColumnSizing();

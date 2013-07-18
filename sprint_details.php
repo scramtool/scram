@@ -11,16 +11,16 @@ require_once 'connect_db.inc.php';
 require_once 'get_username.inc.php';
 require_once 'get_sprint_id.inc.php';
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-<script type="text/javascript" src="scripts/jquery-1.7.2.min.js" ></script>
-<script type="text/javascript" src="scripts/jquery-ui-1.8.20.custom.min.js" ></script>
+<script type="text/javascript" src="scripts/jquery-1.10.2.min.js" ></script>
+<script type="text/javascript" src="scripts/jquery-ui-1.10.3.custom.min.js" ></script>
 <script type="text/javascript" src="scripts/jquery.jeditable.mini.js" ></script>
 <script type="text/javascript" src="scripts/jquery.numeric.js" ></script>
-<script type="text/javascript" src="scripts/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="scripts/jquery.dataTables.js"></script>
 <script type="text/javascript" src="scripts/ColReorderWithResize.js"></script>
 <script type="text/javascript" src="scripts/raphael-min.js"></script>
 <script type="text/javascript" src="scripts/charts.min.js"></script>
@@ -31,7 +31,7 @@ require_once 'get_sprint_id.inc.php';
 
 <link href="css/holygrail.css" rel="stylesheet" type="text/css" />
 <link href="css/scram.css" rel="stylesheet" type="text/css" />
-<link href="css/smoothness/jquery-ui-1.8.20.custom.css" rel="stylesheet" type="text/css" />
+<link href="css/smoothness/jquery-ui-1.10.3.custom.min.css" rel="stylesheet" type="text/css" />
 
 <script type="text/javascript">
 var member_id = <?=$member_id?>;
@@ -50,7 +50,7 @@ $(document).ready(function() {
 	loadTaskTable( sprint_id, 'taskTable');
 	// hack: we need to explicitly resize column headers when the details tab is shown.
 	$( "#tabs" ).tabs({
-		"show": function(event, ui) {
+		"activate": function(event, ui) {
 			var oTable = $('#taskTable').dataTable();
 			if ( oTable.length > 0 ) {
 				oTable.fnAdjustColumnSizing();
@@ -145,12 +145,12 @@ $(document).ready(function() {
                                 <table cellpadding="0" cellspacing="0" border="0"  class="taskTable" id="taskTable">
                                 	<thead>
                                 		<tr>
-                                			<th width="0%">ID</th>
-                                			<th width="0%">Sprint ID</th>
+                                			<th >ID</th>
+                                			<th >Sprint ID</th>
                                 			<th width="40%">Description</th>
                                 			<th width="20%">Status</th>
-                                			<th width="0%">Resource id</th>
-                                			<th width="0%">Story</th>
+                                			<th >Resource id</th>
+                                			<th >Story</th>
                                 			<th width="20%">Who</th>
                                 			<th width="5%">Spent</th>
                                 			<th width="5%">Remaining</th>
