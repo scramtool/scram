@@ -22,27 +22,53 @@ header {
 .leftmenu {
     background:#F4F4F4;
 }
-.leftmenu .colright {
+
+.colright {
        float:left;
        width:200%;
        position:relative;
-       left:12em;
        background:#fff;
 }
+
+.leftmenu .colright {
+       left:12em;
+}
+
+.nomenu .colright {
+		left: 1em;
+}
+
 .leftmenu .col1wrap {
+    right:12em;
+}
+
+.nomenu .col1wrap {
+	right: 1em;
+}
+.col1wrap {
     float:right;
     width:50%;
     position:relative;
-    right:12em;
     padding-bottom:1em;
 }
-.leftmenu .mainColumn {
-       margin:0 1em 0 13em;
+
+.mainColumn {
     position:relative;
     right:100%;
     overflow:hidden;
 }
-.leftmenu .menuColumn {
+
+.leftmenu .mainColumn {
+       margin:0 1em 0 13em;
+}
+
+.nomenu .mainColumn {
+       margin:0 1em 0 1em;
+}
+
+
+
+.menuColumn {
        float:left;
        width:10em;
        position:relative;

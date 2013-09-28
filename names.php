@@ -19,12 +19,18 @@ else
 	$filter = '';
 }
 
+$add_id = isset( $_GET['with_ids']);
+
 $table = Array();
 $headers = Array();
-$result = $database->exec("SELECT name FROM resource $filter");
+$result = $database->exec("SELECT name, resource_id FROM resource $filter ORDER BY name");
 $output = Array();
 while ($database->fetch_row( $result))
 {
-	$output[] = $database->result($result, 1);
+	if ($add_id) {
+	    $output[] = Array( 'name' => $database->result($result, 1), 'id' => $database->result($result, 2));
+	} else {
+	    $output[] = $database->result($result, 1);
+	}
 }
 print json_encode( $output);

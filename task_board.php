@@ -6,6 +6,8 @@
 //  accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 //
+
+// this is essentially a copy of team_member.php. At some point I may want to merge these two pages again.
 require_once 'get_username.inc.php';
 require_once 'get_sprint_id.inc.php';
 
@@ -40,16 +42,23 @@ $(document).ready(function() {
 		        cache: false
 		        });	
      $(".positive-integer").numeric({ decimal: false, negative: false }, function() { alert("Positive integers only"); this.value = ""; this.focus(); });
+     $.getJSON( 'names.php?with_ids', 
+ 			function( names) {
+    	        var sel = $('#names'); 
+ 				$.each( names, function( index, user){
+ 					sel.append( '<option value="' + user.id + '">' + user.name + '</option>');
+ 				});
+ 			});
 	loadTasks( sprint_id, refreshTaskUi);
 	$("#showAll").change( function (event) {
 	         filterTasks($('#showAll').prop('checked'));
 		});
 	});
 </script>
-<title>Task overview for <?=$member_name?></title>
+<title>Task Board</title>
 </head>
 <body>
-<div class="colmask leftmenu">
+<div class="colmask taskboard nomenu">
     <div class="colright">
         <div class="col1wrap">
 			<div class="mainColumn" id="tasks">
@@ -57,7 +66,7 @@ $(document).ready(function() {
 					<a href="#">Team member details</a>
 				</h3>
 				<div class="categoryContent detailsBox" id="teamMemberDetails">
-				    <h2>Tasks for <?=$member_name?></h2>
+				    <h2>Tasks for <select id='names'></select></h2>
 				    <input type='checkbox' value='1' name='showAll' id='showAll' value='showAll' checked/><label for='showAll'>Show all</label>
 				</div>
 
@@ -74,13 +83,6 @@ $(document).ready(function() {
 			    <h3 class="categoryHeader"><a href="#">Forwarded</a></h3>
 			    <div class="categoryContent forwardedTasks"><ul id="forwardedList" class="taskList"></ul><br style="clear:both;"/></div>
 			</div>
-		</div>
-		<div id="menu" class="menuColumn">
-			<h2>Menu</h2>
-			<ul>
-			<li><a href="sprint_details.php">sprint overview</a>
-			<li>team member page
-			</ul>
 		</div>
 	</div>
 </div>

@@ -36,6 +36,11 @@ function loadTasks( sprint, callback) {
 			});
 }
 
+/**
+ * Set up the task table for the sprint details page.
+ * @param sprint_id
+ * @param table_name
+ */
 function loadTaskTable( sprint_id, table_name) {
 	$('#' + table_name).dataTable( {
 		"bProcessing": true,
@@ -55,6 +60,11 @@ function loadTaskTable( sprint_id, table_name) {
 	  } );
 }
 
+/**
+ * Toggle between showing all tasks and showing only the tasks of the
+ * current user.
+ * @param showAll
+ */
 function filterTasks( showAll)
 {
 	if (showAll) {
@@ -137,7 +147,6 @@ function refreshSprintDetails( sprint)
 function submitNewTask()
 {
 	var query = "";
-	var placeholderid = ++placeholderCounter;
 	
 	var task = new Array();
 	$(this).parent().children("input").each( 
@@ -188,6 +197,7 @@ function submitEstimate( )
 			{
 				currentTasks['x'+task.task_id] = task;
 				$("#container-for-" + task.task_id).html( makeTaskMarkup( task, true, true));
+				setAdvancedUIBehaviour();
 			});
 	return false;
 }
@@ -273,6 +283,7 @@ function showTaskDialog()
 	});
 }
 
+/// toggle the visibility of the task state select input
 function showTaskState()
 {
 	//show-task-state-
@@ -413,7 +424,7 @@ function makeTaskMarkup( task, isInWorkList, showStatusSelect)
 		+ makeStatusOption(task, "toBeVerified")
 		+ makeStatusOption(task, "done")
 		+ makeStatusOption(task, "forwarded")
-		+ '</select></div>'
+		+ '</select></div>';
 	}
 	
 	html += '</div><br style="clear:both" /></div><div id="description-for-' 

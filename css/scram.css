@@ -105,6 +105,10 @@ body {
 	width: 240px;
 }
 
+.taskboard #myTasks .note {
+	width: 320px;
+}
+
 .note
 {
 	border-radius: 0px 0px 6px 0px;
@@ -190,6 +194,10 @@ body {
 .taskDetails
 {
 	padding: 3px;
+}
+
+.taskboard #myTasks .taskDetails {
+	font-size: 1.5em;
 }
 
 .centered
