@@ -70,7 +70,9 @@ body {
     padding: 4px 4px 2px 10px;
     margin-bottom: 0;
 }
-
+.positive-integer {
+	text-align: right;
+}
 .taskNumbers
 {
 	background: none repeat scroll 0 0 #A0A0A0;
@@ -155,6 +157,9 @@ body {
 	width: 24px;
 }
 
+.changed {
+	background-color: orange;
+}
 
 .estimate
 {

@@ -309,6 +309,7 @@ function showTaskState()
  * zoomTaskButton:     a small button with an 'expand' icon that will create a modal window on the taks details.
  * taskDetails:        a div that becomes editable when double-clicked
  * positive-integer:   a text input that only allows positive integers to be entered.
+ * show-changes		   an input that will add the class 'changed' when its value differs from the original value.
  */
 function setAdvancedUIBehaviour()
 {
@@ -320,6 +321,7 @@ function setAdvancedUIBehaviour()
 	$(".positive-integer").numeric({ decimal: false, negative: false }, function() { 
 		alert("Positive integers only"); this.value = ""; this.focus(); 
 		});
+	$(".show-changes").change(changedMarkup);
 }
 
 /**
@@ -392,8 +394,10 @@ function makeTaskMarkup( task, isInWorkList, showStatusSelect)
 		reported_time = 
 			'<form>'+
 			' <input type="hidden" class="holdsTaskId" name="task_id" value="' + task.task_id + '"/>' +
-			' <label for="estimate">left:</label><input type="text"  id="estimate" name="estimate" class="estimate positive-integer" value="' + task.estimate + '"/>'+
-			' <label for="spent">spent:</label><input type="text" id="spent" name="spent" class="estimate positive-integer" value="0"/>'+
+			' <input type="hidden" id="estimate-original" value="' + task.estimate + '"/>' +
+			' <input type="hidden" id="spent-original" value="0"/>' +
+			' <label for="estimate">left:</label><input type="text"  id="estimate" name="estimate" class="estimate positive-integer show-changes" value="' + task.estimate + '"/>'+
+			' <label for="spent">spent:</label><input type="text" id="spent" name="spent" class="estimate positive-integer show-changes" value="0"/>'+
 			' <button class="submitReportButton">Submit Todays numbers</button>'+
 			'</form>';
 	}
@@ -431,6 +435,34 @@ function makeTaskMarkup( task, isInWorkList, showStatusSelect)
 		+ task.task_id + '" class="taskDetails">' + task.description  +'</div></div>';
 	
 	return html;
+}
+
+/**
+ * This handler function is fired for selected input elements after they have changed.
+ * It assumes there is a sibling (hidden) element with name "<id of this element>-original".
+ * If the value of that element is different than the source element, the source element
+ * will get the additional style 'changed'. If the values are the same, the 'changed' style will be removed
+ * if present.
+ * 
+ * It would have been possible to compare the value attribute with the value property instead of relying
+ * on an additional hidden input, but that won't work with some older IE browsers.
+ */
+function changedMarkup() 
+{
+	// find the input with id '<source element id>-original'
+	var originalId = '#' + $(this).prop('id') + '-original';
+	var originalInput = $(this).siblings( originalId);
+	
+	// get the original value and the new value
+	var original = originalInput.val();
+	var current = $(this).val();
+	
+	// apply the 'changed' style, if applicable.
+	if ( original == current) {
+		$(this).removeClass('changed');
+	} else {
+		$(this).addClass('changed');
+	}
 }
 
 /**
