@@ -37,17 +37,23 @@ var need_identification = <?=$need_identification?1:0?>;
 var sprint_id = <?=$sprint_id?>;
 //var tasks = new Array();
 $(document).ready(function() {
-	 $.ajaxSetup({
+	$.ajaxSetup({
 		        // Disable caching of AJAX responses */
 		        cache: false
 		        });	
-     $(".positive-integer").numeric({ decimal: false, negative: false }, function() { alert("Positive integers only"); this.value = ""; this.focus(); });
-     $.getJSON( 'names.php?with_ids', 
+    $(".positive-integer").numeric({ decimal: false, negative: false }, function() { alert("Positive integers only"); this.value = ""; this.focus(); });
+ 	$('#names').change( function (value) {
+		member_id = $(this).val();
+		refreshTaskUi();
+		filterTasks($('#showAll').prop('checked'));
+	});
+    $.getJSON( 'names.php?with_ids', 
  			function( names) {
     	        var sel = $('#names'); 
  				$.each( names, function( index, user){
  					sel.append( '<option value="' + user.id + '">' + user.name + '</option>');
  				});
+ 				sel.change();
  			});
 	loadTasks( sprint_id, refreshTaskUi);
 	$("#showAll").change( function (event) {
@@ -61,13 +67,13 @@ $(document).ready(function() {
 <div class="colmask taskboard nomenu">
     <div class="colright">
         <div class="col1wrap">
-			<div class="mainColumn" id="tasks">
+			<div class="mainColumn scrumBoardTasks" id="tasks">
 				<h3 class="categoryHeader">
 					<a href="#">Team member details</a>
 				</h3>
 				<div class="categoryContent detailsBox" id="teamMemberDetails">
 				    <h2>Tasks for <select id='names'></select></h2>
-				    <input type='checkbox' value='1' name='showAll' id='showAll' value='showAll' checked/><label for='showAll'>Show all</label>
+				    <input type='checkbox' value='1' name='showAll' id='showAll' value='showAll' checked/><label for='showAll'>Show others</label>
 				</div>
 
 				<h3 class="categoryHeader"><a href="#">My Tasks in Progress</a></h3>
