@@ -107,7 +107,7 @@ function createAvailabilityTable( sprint_id, element_id, data)
 		
 		// collect all hourCell values that are non-trivial (not zero or empty).
 		$('.hourCell').each( function (index) {
-			var value = $(this).attr( 'value');
+			var value = $(this).prop( 'value');
 			if ( parseInt(value) != 0 && value != '') {
 				var key = $(this).attr( 'id');
 				compressed[ key] = value; 
