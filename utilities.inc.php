@@ -8,8 +8,10 @@
 //
 
 /**
- * Take an associative array and create global variables out of the 
- * Enter description here ...
+ * Take an associative array and create global variables out of the elements of the array
+ * The keys of the array are used for the variable names. If the given name does not exist
+ * in the array, a variable will still be created, but its value will be null. This ensures
+ * that every variable name in $names is defined.
  * @param unknown_type $input
  * @param unknown_type $names
  */
@@ -19,6 +21,8 @@ function make_global( &$input, $names)
 		if (isset( $input[$name]))
 		{
 			$GLOBALS[$name] =  $input[$name];
+		} else {
+		    $GLOBALS[$name] = null; // so that it is not undefined
 		}
 	}
 }

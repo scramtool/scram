@@ -203,25 +203,20 @@ function submitEstimate( )
 }
 
 /**
- * Submit the new state of a task.
+ * This event handler is called when the state select of a task changes. It will submit the new state of the task to the server and may 
+ * submit the estimate values if they were changed by the user.
+ * 
  * @returns {Boolean}
  */
 function submitState( )
 {
 	var obj_id = "#" + $(this).attr('id');
+	$(this).change(function(){}); // do nothing on subsequent changes.
 	var new_status = $(obj_id + " option:selected").val();
 	var task_id = obj_id.substring(19);
-	var query = '?action=move&task_id=' + task_id +'&status=' + new_status;
-			
-	$('#description-for-' + task_id).html('<img class="centered" src="images/ajax-loader.gif"/>');
-	$.getJSON( taskListUrl + query,
-			function (task)
-			{
-				currentTasks['x'+task.task_id] = task;
-				$("#container-for-" + task.task_id).html( makeTaskMarkup( task, false, true));
-				$("#container-for-" + task.task_id).prependTo( "#" + new_status + "List");				
-				setAdvancedUIBehaviour();
-			});
+		
+	var newValues = {'task_id':task_id, 'status': new_status};
+	submitTaskChanges( newValues, true);
 	return false;
 }
 
@@ -299,6 +294,53 @@ function showTaskState()
 	}
 }
 
+function menuClicked( key, options)
+{
+	alert( 'clicked:' + key);
+}
+
+function addMenus()
+{
+	
+	    $.contextMenu({
+	        selector: '.taskNote', 
+	        zIndex:0,
+	        callback: function(key, options) {
+	            var m = "clicked: " + key;
+	            window.console && console.log(m) || alert(m); 
+	        },
+	        items: {
+	            "edit": {name: "Edit", icon: "edit"},
+	            "cut": {name: "Cut", icon: "cut"},
+	            "copy": {name: "Copy", icon: "copy"},
+	            "paste": {name: "Paste", icon: "paste"},
+	            "delete": {name: "Delete", icon: "delete"},
+	            "sep1": "---------",
+	            "quit": {name: "Quit", icon: "quit"}
+	        }
+	    });
+}
+
+function addMenus2()
+{
+	$.contextMenu({
+		selector : '.taskNote',
+		callback : menuClicked,
+		items: {
+			"move": { 
+				"name": "Move to",
+				"items": {
+					"toDo": {name: "To Do"},
+					"inProgress": { name: "In Progress"},
+					"toBeVerified": { name: "To Be Verified"},
+					"done" : { name: "Done"},
+					"forwarded" : { name: "Forwarded"}
+				}
+			}
+		}
+	});
+}
+
 /**
  * Set up advanced ui behaviour. This is behaviour that can't be reached with stylesheets alone and that need some
  * extra javascript to set up. It is safe to call this function multiple times on a page.
@@ -316,11 +358,12 @@ function setAdvancedUIBehaviour()
 	$(".submitReportButton").button( {icons: {primary: "ui-icon-disk"}, text:false}).unbind('click').click( submitEstimate);
 	$(".showTaskStateButton").button( {icons: {primary: "ui-icon-arrowthick-1-s"}, text:false}).unbind('click').click(  showTaskState);
 	$(".zoomTaskButton").button( {icons: {primary: "ui-icon-extlink"}, text:false}).unbind('click').click( showTaskDialog);
-	$(".taskStateSelect").change( submitState);
+	$(".taskStateSelect").unbind('change').change( submitState);
 	$('.taskDetails').each( makeEditable); 
 	$(".positive-integer").numeric({ decimal: false, negative: false }, function() { 
 		alert("Positive integers only"); this.value = ""; this.focus(); 
 		});
+//	addMenus();
 	$(".show-changes").change(changedMarkup);
 }
 
@@ -414,7 +457,7 @@ function makeTaskMarkup( task, isInWorkList, showStatusSelect)
 		}
 	}
 	
-	html = '<div class="' + note_class + '"><div class="taskNumbers">'
+	var html = '<div class="' + note_class + '"><div class="taskNumbers">'
 		+ reported_time + '<div style="float:right"><button class="zoomTaskButton" id="zoom-task-'
 		+ task.task_id + '" />';
 		
@@ -522,10 +565,10 @@ function createTaskListItem( task, showStatusSelect)
 			{
 				'class': 'taskNote', 
 				'id':'container-for-' + task.task_id, 
-				'html':makeTaskMarkup( task, worksOnTask( member_id, task) || 
-						                     worksOnTBVTask( member_id, task),
+				'html':makeTaskMarkup( task, isTaskEstimateable(member_id, task),
 						                     showStatusSelect )
 			}
+
 		);
 }
 
@@ -549,15 +592,49 @@ function refreshSprintTasks()
 
 function refreshSprintPeople()
 {
-	// clear all scrumboards
+	// clear the people list
 	$("#sprintPeople").html("");
 	
-	// now send the tasks to their appropriate scrumboard.
+	// now add each person to the people list
 	for (var person_key in currentPeople)
 	{
 		addPersonToList( currentPeople[person_key], "#sprintPeople");
 	}
 	
+}
+
+/**
+ * kind-of generic function to deal with changes in a task.
+ * @param newValues
+ * @param allowMove
+ */
+function submitTaskChanges( newValues, allowMove) {
+	var task_id = newValues.task_id;
+	
+	// try to find out if estimates have changed as well, in which case we need to submit those changes
+	// together with the move.
+	var changedSelector = '#container-for-'+task_id+' .changed';
+	var changedEstimates = $( changedSelector).length;
+	$(changedSelector).removeClass('changed'); // un-mark as changed.
+	
+	// if estimates were changed, we also need to upload the new estimates.
+	if (changedEstimates) {
+		newValues.spent = $('#container-for-'+task_id+' #spent').val();
+		newValues.estimate = $('#container-for-'+task_id+' #estimate').val();
+	}
+
+	var query = '?action=move&' + $.param( newValues);
+	$('#description-for-' + task_id).html('<img class="centered" src="images/ajax-loader.gif"/>');
+	$.getJSON( taskListUrl + query,
+			function (task)
+			{
+				currentTasks['x'+task.task_id] = task;
+				$("#container-for-" + task.task_id).html( makeTaskMarkup( task, isTaskEstimateable(member_id, task), true));
+				var target = newValues.status + "List";
+				if (worksOnTask(member_id, task)) target = "myTasks"; 
+				if (allowMove) $("#container-for-" + task.task_id).prependTo( "#" + target);				
+				setAdvancedUIBehaviour();
+			});
 }
 
 /**
@@ -571,6 +648,8 @@ function noteReceived( event, ui)
 	var task_id = $(ui.item).attr("id").replace('container-for-','');
 	var new_status = $(this).attr("id").replace('List', '');
 	var old_status = $(ui.sender).attr("id").replace('List','');
+	var to_mytasks = false;
+	
 	if (new_status == 'inProgress' && old_status == 'myTasks' )
 	{
 		$(ui.sender).sortable('cancel');
@@ -586,20 +665,19 @@ function noteReceived( event, ui)
 			{
 			to_mytasks = false;
 			}
-		query = '?action=move&task_id=' + task_id +'&status=' + new_status;
+		var newValues = {'task_id': task_id, 'status': new_status};
 		if (to_mytasks && currentTasks['x'+task_id].resource_id != member_id)
 		{
-			query += '&owner=' + member_id;
+			newValues.owner = member_id;
 		}
-		$('#description-for-' + task_id).html('<img class="centered" src="images/ajax-loader.gif"/>');
-		$.getJSON( taskListUrl + query,
-				function (task)
-				{
-					currentTasks['x'+task.task_id] = task;
-					$("#container-for-" + task.task_id).html( makeTaskMarkup( task, to_mytasks, true));
-					setAdvancedUIBehaviour();
-				});
+		submitTaskChanges( newValues, false);
 	}
+}
+
+function isTaskEstimateable( resourceId, taskInfo)
+{
+	return taskInfo.resource_id == resourceId && 
+		((taskInfo.status == 'inProgress') || taskInfo.status == 'toBeVerified');
 }
 
 /**
@@ -612,19 +690,6 @@ function worksOnTask( resourceId, taskInfo)
 {
 	return taskInfo.resource_id == resourceId && 
 	    (taskInfo.status == 'inProgress');
-}
-
-/**
- * Does the person with the given resourceId currently work on this task
- * which has status 'to be verified'?
- * @param resourceId
- * @param taskInfo
- * @returns {Boolean}
- */
-function worksOnTBVTask( resourceId, taskInfo)
-{
-	return taskInfo.resource_id == resourceId && 
-	    (taskInfo.status == 'toBeVerified');
 }
 
 

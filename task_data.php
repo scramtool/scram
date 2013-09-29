@@ -59,18 +59,22 @@ function print_single_task( $task_id)
 	print json_encode($task_info);
 }
 
+function update_report( $task_id, $estimate, $spent)
+{
+    global $database;
+    $log= new Log( $database);
+    $log->estimate($task_id, $estimate, $spent);
+    
+    $success = $database->exec("INSERT INTO report(task_id, resource_id, date, burnt, estimate) SELECT $task_id, resource_id, NOW(), $spent, $estimate FROM task WHERE task_id = $task_id");
+    return $success;
+}
+
 function handle_report( $task_id, $estimate, $spent)
 {
-	global $database;
-	$log= new Log( $database);
-	$log->estimate($task_id, $estimate, $spent);
-
-	$success = $database->exec("INSERT INTO report(task_id, resource_id, date, burnt, estimate) SELECT $task_id, resource_id, NOW(), $spent, $estimate FROM task WHERE task_id = $task_id");
-	if ($success)
+	if (update_report($task_id, $estimate, $spent))
 	{
 		print_single_task( $task_id);
 	}
-
 }
 
 /**
@@ -81,11 +85,16 @@ function handle_report( $task_id, $estimate, $spent)
  * @param unknown $status The new status of the task
  * @param unknown $owner The person performing the move.
  */
-function handle_move( $task_id, $status, $owner)
+function handle_move( $task_id, $status, $owner, $estimate = null, $spent = null)
 {
 	global $database;
 	$task_id = $database->escape($task_id);
 	$status = $database->escape( $status);
+	
+	if (isset($estimate) && isset( $spent))
+	{
+	    update_report( $task_id, $estimate, $spent);    
+	}
 	
 	if (isset( $owner))
 	{
@@ -194,19 +203,8 @@ if (isset($_GET['action']))
 		handle_report($task_id, $estimate, $spent);
 		break;
 	case 'move':
-		make_global( $_GET, Array('task_id', 'status', 'owner'));
-
-		// Yesteryear, I could just give an undefined variable as an argument to a function
-		// and the function would determine if it was a defined value. Nowadays I get warnings
-		// if I try to use the undefined variable.
-		if (isset( $owner))
-		{
-			handle_move( $task_id, $status, $owner);
-		}
-		else
-		{
-			handle_move( $task_id, $status, null);
-		}
+		make_global( $_GET, Array('task_id', 'status', 'owner', 'estimate', 'spent'));
+		handle_move( $task_id, $status, $owner, $estimate, $spent);
 		break;
 	case 'add':
 		handle_add( $_GET);
