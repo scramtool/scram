@@ -144,6 +144,7 @@ $(document).ready(function() {
 								</form>
 							</div>
                                 <table cellpadding="0" cellspacing="0" border="0"  class="taskTable" id="taskTable">
+								    <caption><a href="task_data.php?action=csv&sprint_id=<?=$sprint_id?>">Click here to download this data</a></caption>
                                 	<thead>
                                 		<tr>
                                 			<th >ID</th>

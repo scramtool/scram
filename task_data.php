@@ -52,6 +52,32 @@ function print_task_table_data( $sprint_id)
     print json_encode($result);
 }
 
+function print_csv( $headers, $table)
+{
+	$outstream = fopen("php://output", 'w');
+	fputcsv( $outstream, $headers);
+	foreach( $table as $row)
+	{
+		fputcsv( $outstream, array_values( $row));
+	}
+	fclose( $outstream);
+}
+
+function print_task_table_csv( $sprint_id)
+{
+    global $database;
+    $headers = array();
+    $tasks = array();
+    $result = array();
+    
+    $database->get_result_table( get_task_table_query($sprint_id), $headers, $tasks);
+	header("Content-type: text/csv");
+	header("Content-Disposition: attachment; filename=sprint_tasks.csv");
+	header("Pragma: no-cache");
+	header("Expires: 0");
+	print_csv( $headers, $tasks);
+}
+
 function print_single_task( $task_id)
 {
 	global $database;
@@ -212,6 +238,9 @@ if (isset($_GET['action']))
 	case 'table':
 	    print_task_table_data($sprint_id);
 	    break;
+	case 'csv':
+		print_task_table_csv( $sprint_id);
+		break;
 	}
 }
 else 
