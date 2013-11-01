@@ -64,6 +64,7 @@ $(document).ready(function() {
 	         filterTasks($('#showAll').prop('checked'));
 		});
 	});
+	filterTasks($('#showAll').prop('checked'));
 </script>
 <title>Task Board</title>
 </head>
@@ -77,7 +78,7 @@ $(document).ready(function() {
 				</h3>
 				<div class="categoryContent detailsBox" id="teamMemberDetails">
 				    <h2>Tasks for <select id='names'></select></h2>
-				    <input type='checkbox' value='1' name='showAll' id='showAll' value='showAll' checked/><label for='showAll'>Show others</label>
+				    <input type='checkbox' name='showAll' id='showAll' value='showAll'/><label for='showAll'>Show others</label>
 				</div>
 
 				<h3 class="categoryHeader"><a href="#">My Tasks in Progress</a></h3>
