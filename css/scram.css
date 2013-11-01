@@ -108,7 +108,8 @@ body {
 }
 
 .taskboard #myTasks .note {
-	width: 320px;
+	font-size: 2em;
+	width: 500px;
 }
 
 .note
@@ -150,16 +151,18 @@ body {
 	height: 30px; 
 }
 
-.estimate, .submitReportButton, .dailyRation, .zoomTaskButton
+.submitReportButton, .dailyRation, .zoomTaskButton
 {
+	font-size:90%;
 	vertical-align: middle;
-	height: 24px;
-	width: 24px;
+	height: 1em;
+	width: 1em;
 }
 
 .changed {
 	background-color: orange;
 }
+
 
 .estimate
 {
@@ -167,13 +170,18 @@ body {
 	border-width: 1px;
 	border-radius: 3px;
 	border-color: black;
+	width: 1.7em;
+	height: 1.2em;
+}
+
+.taskboard #myTasks .estimate
+{
+	font-size:80%
 }
 
 .frozen
 {
 	margin:1px;
-	width: 22px;
-	height: 22px;
 }
 
 .greenNote .frozen
@@ -202,7 +210,6 @@ body {
 }
 
 .taskboard #myTasks .taskDetails {
-	font-size: 1.5em;
 }
 
 .centered
