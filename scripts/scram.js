@@ -299,7 +299,7 @@ function menuClicked( key, options)
 	alert( 'clicked:' + key);
 }
 
-function addMenus()
+function addMenus_old()
 {
 	
 	    $.contextMenu({
@@ -321,7 +321,7 @@ function addMenus()
 	    });
 }
 
-function addMenus2()
+function addMenus()
 {
 	$.contextMenu({
 		selector : '.taskNote',
@@ -335,7 +335,9 @@ function addMenus2()
 					"toBeVerified": { name: "To Be Verified"},
 					"done" : { name: "Done"},
 					"forwarded" : { name: "Forwarded"}
-				}
+				
+				},
+				"icon": "paste"
 			}
 		}
 	});
@@ -363,7 +365,7 @@ function setAdvancedUIBehaviour()
 	$(".positive-integer").numeric({ decimal: false, negative: false }, function() { 
 		alert("Positive integers only"); this.value = ""; this.focus(); 
 		});
-//	addMenus();
+	addMenus();
 	$(".show-changes").change(changedMarkup);
 }
 
@@ -691,9 +693,6 @@ function worksOnTask( resourceId, taskInfo)
 	return taskInfo.resource_id == resourceId && 
 	    (taskInfo.status == 'inProgress');
 }
-
-
-
 
 /**
  * Determine whether two DateTimes are on the same day. 
