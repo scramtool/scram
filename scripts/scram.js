@@ -265,9 +265,9 @@ function showTaskDialog()
 {
 	// assume the button that causes this function to be called has an id of the
 	// form
-	// 'zoom-task-<task_id>'. Which means that if we cut of the first 10
+	// 'container-for-<task_id>'. Which means that if we cut of the first 14
 	// characters, we get the task id.
-	var id = $(this).attr('id').substring(10);
+	var id = $(this).attr('id').substring(14);
 	var url = 'task_form.php?task_id=' + id;
 	if (typeof theModalDialog == 'undefined') {
 		theModalDialog = $("<div />");
@@ -338,7 +338,10 @@ function addMenus()
 				
 				},
 				"icon": "paste"
-			}
+			},
+			"split" : { name: "Split"},
+			"details": { name: "Details", callback: showTaskDialog }
+		
 		}
 	});
 }
@@ -460,23 +463,10 @@ function makeTaskMarkup( task, isInWorkList, showStatusSelect)
 	}
 	
 	var html = '<div class="' + note_class + '"><div class="taskNumbers">'
-		+ reported_time + '<div style="float:right"><button class="zoomTaskButton" id="zoom-task-'
-		+ task.task_id + '" />';
+		+ reported_time ;
 		
-	if (showStatusSelect)
-	{
-		html += '<button class="showTaskStateButton" id="show-task-state-'
-		+ task.task_id + '" /><div class="taskStateSelect" id="task-state-select-'
-		+ task.task_id + '"><select style="background-color: #b0b0e4;">'
-		+ makeStatusOption(task, "toDo")
-		+ makeStatusOption(task, "inProgress")
-		+ makeStatusOption(task, "toBeVerified")
-		+ makeStatusOption(task, "done")
-		+ makeStatusOption(task, "forwarded")
-		+ '</select></div>';
-	}
-	
-	html += '</div><br style="clear:both" /></div><div id="description-for-' 
+
+	html += '<br style="clear:both" /></div><div id="description-for-' 
 		+ task.task_id + '" class="taskDetails">' + task.description  +'</div></div>';
 	
 	return html;
