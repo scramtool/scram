@@ -15,9 +15,12 @@ require_once 'get_sprint_id.inc.php';
 <head>
 <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
 <link href="css/smoothness/jquery-ui-1.10.3.custom.min.css" rel="stylesheet" type="text/css"/>
 <link href="css/scram.css" rel="stylesheet" type="text/css"/>
 <link href="css/holygrail.css" rel="stylesheet" type="text/css"/>
+<link href="css/jquery.contextMenu.css" rel="stylesheet" type="text/css"/>
+
 <script type="text/javascript" src="scripts/jquery-1.10.2.min.js"/></script>
 <script type="text/javascript" src="scripts/jquery-ui-1.10.3.custom.min.js"/></script>
 <script type="text/javascript" src="scripts/jquery.jeditable.mini.js"/></script>
@@ -27,7 +30,7 @@ require_once 'get_sprint_id.inc.php';
 <script type="text/javascript" src="scripts/raphael-min.js"></script>
 <script type="text/javascript" src="scripts/charts.min.js"></script>
 <script type="text/javascript" src="scripts/scram-charts.js"></script>
-
+<script type="text/javascript" src="scripts/jquery.contextMenu.js"></script>
 
 <script type="text/javascript">
 var member_id = <?=$member_id?>;
