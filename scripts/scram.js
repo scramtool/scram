@@ -261,13 +261,17 @@ function makeEditable( index, value)
     });
 }
 
-function showTaskDialog()
+function containerIdToTaskId( containerId)
 {
-	// assume the button that causes this function to be called has an id of the
-	// form
+	// assume the container has an id of the form
 	// 'container-for-<task_id>'. Which means that if we cut of the first 14
 	// characters, we get the task id.
-	var id = $(this).attr('id').substring(14);
+	return containerId.substring(14);
+}
+
+function showTaskDialog()
+{
+	var id = containerIdToTaskId($(this).attr('id'));
 	var url = 'task_form.php?task_id=' + id;
 	if (typeof theModalDialog == 'undefined') {
 		theModalDialog = $("<div />");
@@ -278,47 +282,22 @@ function showTaskDialog()
 	});
 }
 
-/// toggle the visibility of the task state select input
-function showTaskState()
-{
-	//show-task-state-
-	var task_id = $(this).attr('id').substring(16);
-	var select_id = "#task-state-select-" + task_id;
-	if ($(select_id).css('visibility') == 'hidden')
-	{
-		$(select_id).css("visibility", "visible");
-	}
-	else
-	{
-		$(select_id).css("visibility", "hidden");
-	}
-}
-
 function menuClicked( key, options)
 {
-	alert( 'clicked:' + key);
+	var obj_id = "#" + $(this).attr('id');
+	alert( 'clicked:' + key + ' on:' + obj_id);
 }
 
-function addMenus_old()
+/**
+ * This function is called when the user selects one of the "Move to" menu items.
+ * @param key the name of the new state
+ * @param options unused
+ */
+function moveItem( key, options)
 {
-	
-	    $.contextMenu({
-	        selector: '.taskNote', 
-	        zIndex:0,
-	        callback: function(key, options) {
-	            var m = "clicked: " + key;
-	            window.console && console.log(m) || alert(m); 
-	        },
-	        items: {
-	            "edit": {name: "Edit", icon: "edit"},
-	            "cut": {name: "Cut", icon: "cut"},
-	            "copy": {name: "Copy", icon: "copy"},
-	            "paste": {name: "Paste", icon: "paste"},
-	            "delete": {name: "Delete", icon: "delete"},
-	            "sep1": "---------",
-	            "quit": {name: "Quit", icon: "quit"}
-	        }
-	    });
+	var task_id = containerIdToTaskId( $(this).attr('id'));
+	var newValues = {'task_id':task_id, 'status': key};
+	submitTaskChanges( newValues, true);
 }
 
 function addMenus()
@@ -330,11 +309,11 @@ function addMenus()
 			"move": { 
 				"name": "Move to",
 				"items": {
-					"toDo": {name: "To Do"},
-					"inProgress": { name: "In Progress"},
-					"toBeVerified": { name: "To Be Verified"},
-					"done" : { name: "Done"},
-					"forwarded" : { name: "Forwarded"}
+					"toDo": {name: "To Do", callback: moveItem},
+					"inProgress": { name: "In Progress", callback: moveItem},
+					"toBeVerified": { name: "To Be Verified", callback: moveItem},
+					"done" : { name: "Done", callback: moveItem},
+					"forwarded" : { name: "Forwarded", callback: moveItem}
 				
 				},
 				"icon": "paste"
@@ -342,6 +321,14 @@ function addMenus()
 			"split" : { name: "Split"},
 			"details": { name: "Details", callback: showTaskDialog }
 		
+		}
+	});
+	
+	$.contextMenu({
+		selector: '.categoryContent',
+		callback : menuClicked,
+		items: {
+			'newTask' : { name: 'New Task'}
 		}
 	});
 }
@@ -361,7 +348,6 @@ function addMenus()
 function setAdvancedUIBehaviour()
 {
 	$(".submitReportButton").button( {icons: {primary: "ui-icon-disk"}, text:false}).unbind('click').click( submitEstimate);
-	$(".showTaskStateButton").button( {icons: {primary: "ui-icon-arrowthick-1-s"}, text:false}).unbind('click').click(  showTaskState);
 	$(".zoomTaskButton").button( {icons: {primary: "ui-icon-extlink"}, text:false}).unbind('click').click( showTaskDialog);
 	$(".taskStateSelect").unbind('change').change( submitState);
 	$('.taskDetails').each( makeEditable); 
