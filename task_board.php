@@ -20,7 +20,7 @@ require_once 'get_sprint_id.inc.php';
 <link href="css/smoothness/jquery-ui-1.10.3.custom.min.css" rel="stylesheet" type="text/css"/>
 <link href="css/scram.css" rel="stylesheet" type="text/css"/>
 <link href="css/holygrail.css" rel="stylesheet" type="text/css"/>
-<link href="scripts/jquery.contextMenu.css" type="text/css"/>
+<link href="css/jquery.contextMenu.css" rel="stylesheet" type="text/css"/>
 
 <script type="text/javascript" src="scripts/jquery-1.10.2.min.js"/></script>
 <script type="text/javascript" src="scripts/jquery-ui-1.10.3.custom.min.js"/></script>
