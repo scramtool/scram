@@ -20,6 +20,7 @@ $task = $database->get_single_result( get_task_query(0,$task_id));
 $wiki = new wiky();
 $task_html = $wiki->parse( $task['story']);
 
+$inputwidth = 50;
 ?>
 <html>
 <head>
@@ -30,11 +31,24 @@ $(document).ready(function(){
 </script>
 </head>
 <body>
+<form>
 <div id='taskForm' class='yellowNote'>
-<div class='taskNumbers'><div id='taskEstimate' class='frozen estimate'><?=$task['estimate']?></div><div id='taskOwner'><?=$task['name']?></div></div>
-<div class='taskDescription' id='description'><?=$task['description']?></div>
-<div class='smallChart' style="width:400px;height:200px" id='taskBurnDown' ></div>
-<div class='taskStory' id='story'><?=$task_html?></div>
-<br style="clear:both" />
+<div class="taskNumbers">
+<div>
+    <input type="text" size='20' id="taskOwner" name="member_name" class="taskOwner" value='<?=$task['name']?>'/>
 </div>
+<div>
+    <label for="taskEstimate">left:</label>
+    <input type='text' id='taskEstimate' class='estimate positive-integer show_changes' value='<?=$task['estimate']?>'>
+    <label for="taskSpent">spent today:</label>
+    <input type='text' id='taskSpent' class='estimate positive-integer show_changes' value='<?=$task['burnt']?>'>
+</div>
+</div>
+<textarea cols= '<?=$inputwidth?>' class='taskDescription' id='description' ><?=$task['description']?></textarea>
+<br style="clear:both" />
+<button class='submitTaskButton'>Submit changes</button>
+<div class='taskStory' id='story'><?=$task_html?></div>
+</div>
+<div class='smallChart' style="width:400px;height:200px" id='taskBurnDown' ></div>
+</form>
 </body>

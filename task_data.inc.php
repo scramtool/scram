@@ -23,7 +23,7 @@ function get_task_query( $sprint_id, $task_id = -1)
 		$report_restriction = "WHERE sprint_id =$sprint_id  AND report.reason!='forward'";
 	}
 	return <<<EOT
-SELECT task.* , resource.name, report.estimate, DATE_FORMAT(report_date, "%Y-%m-%d") as report_date
+SELECT task.* , resource.name, report.estimate, report.burnt, DATE_FORMAT(report_date, "%Y-%m-%d") as report_date
 FROM (
 	SELECT report.task_id, max( date ) AS report_date
 	FROM report

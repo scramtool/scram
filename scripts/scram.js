@@ -190,13 +190,13 @@ function submitNewTask()
 function submitEstimate( )
 {
 	var query = "";
-	$(this).parent().children("input").each( function(index, element) {query += '&' + element.name + "=" + element.value;});
+	$(this).parent().find("input").each( function(index, element) {query += '&' + element.name + "=" + element.value;});
 	$(this).replaceWith( '<img class="centered" src="images/ajax-loader.gif"/>');
 	$.getJSON( taskListUrl + '?action=report' + query,
 			function (task)
 			{
 				currentTasks['x'+task.task_id] = task;
-				$("#container-for-" + task.task_id).html( makeTaskMarkup( task, true, true));
+				$("#container-for-" + task.task_id).html( makeTaskMarkup( task, true));
 				setAdvancedUIBehaviour();
 			});
 	return false;
@@ -340,7 +340,6 @@ function addMenus()
  * supported behaviour-classes are :
  * 
  * submitReportButton: a small button with icon and no text, inside a task div that will call submitEstimate() when pressed
- * zoomTaskButton:     a small button with an 'expand' icon that will create a modal window on the taks details.
  * taskDetails:        a div that becomes editable when double-clicked
  * positive-integer:   a text input that only allows positive integers to be entered.
  * show-changes		   an input that will add the class 'changed' when its value differs from the original value.
@@ -348,8 +347,6 @@ function addMenus()
 function setAdvancedUIBehaviour()
 {
 	$(".submitReportButton").button( {icons: {primary: "ui-icon-disk"}, text:false}).unbind('click').click( submitEstimate);
-	$(".zoomTaskButton").button( {icons: {primary: "ui-icon-extlink"}, text:false}).unbind('click').click( showTaskDialog);
-	$(".taskStateSelect").unbind('change').change( submitState);
 	$('.taskDetails').each( makeEditable); 
 	$(".positive-integer").numeric({ decimal: false, negative: false }, function() { 
 		alert("Positive integers only"); this.value = ""; this.focus(); 
@@ -413,28 +410,59 @@ function addPersonToList( person, listName)
  * @param isInWorkList Whether the task is displayed in the current work list (this means that a form for estimates will be shown)
  * @returns
  */
-function makeTaskMarkup( task, isInWorkList, showStatusSelect)
+function makeTaskMarkup( task, isInWorkList)
 {
-	var reported_time;
 	var note_class = "note yellowNote";
 	
+	// the 'title bar' of the task, including the estimate number and the name of the assignee
+	var reported_time = $('<div class="clickable estimate frozen">' + task.estimate + '</div><div>&nbsp;&nbsp;&nbsp;</div><div>' + task.name+ '</div>');
 	
-	if (!isInWorkList || isOnSameDay( Date.parse(task.report_date), new Date()))
-	{
-		reported_time = '<div class="clickable estimate frozen">' + task.estimate + '</div><div>&nbsp;&nbsp;&nbsp;</div><div>' + task.name+ '</div>';
-	}
-	else
-	{
-		reported_time = 
-			'<form>'+
+	// create the complete 'title bar' with header and sliding form
+	var title_bar = $('<div class="taskNumbers"/>').append( reported_time);
+	
+	// if this is a task of the current user and it it either in progress or to be verified, add
+	// a form to allow submitting new estimates.
+	if (isInWorkList) {
+		var today = new Date();
+		var report_date = Date.parse( task.report_date);
+		var today_string = today.toString( "yyyy-MM-dd");
+
+		// form to fill in estimate and hours spent, all enclosed in a div
+		var report_form = $(
+			'<div class="overlay">' +
+			'<form class = "taskNumberForm">'+
 			' <input type="hidden" class="holdsTaskId" name="task_id" value="' + task.task_id + '"/>' +
+			' <input type="hidden" name="ref_date" id="ref-date" value="' + today_string + '"/>' + 
 			' <input type="hidden" id="estimate-original" value="' + task.estimate + '"/>' +
 			' <input type="hidden" id="spent-original" value="0"/>' +
-			' <label for="estimate">left:</label><input type="text"  id="estimate" name="estimate" class="estimate positive-integer show-changes" value="' + task.estimate + '"/>'+
-			' <label for="spent">spent:</label><input type="text" id="spent" name="spent" class="estimate positive-integer show-changes" value="0"/>'+
-			' <button class="submitReportButton">Submit Todays numbers</button>'+
-			'</form>';
+			' <label for="estimate">left:</label><div class="holdClick"><input type="text"  id="estimate" name="estimate" class="estimate positive-integer show-changes" value="' + task.estimate + '"/> </div>'+
+			' <label for="spent">spent:</label><div class="holdClick"> <input type="text" id="spent" name="spent" class="estimate positive-integer show-changes" value="0"/> </div>'+
+			' <button class="submitReportButton" style="margin: 2px 4px;">Submit Todays numbers</button>'+
+			'</form>'+
+			'</div>'
+			);
+		
+		// make sure that clicking in the tasknumber fields doesn't slide the whole form out of view.
+		report_form.find('.holdClick').click( function(e){ 
+			e.stopPropagation(); 
+			return false;
+			});
+		
+
+		if (isOnSameDay( report_date, today))
+		{
+			report_form.find('#spent, #spent-original').val( task.burnt);
+			report_form.hide();
+		}	
+
+		title_bar
+			.append( report_form)
+			.css( 'cursor', 'pointer')
+			.on('click', function() {
+					$(this).children('.overlay').toggle( 'slide', {direction:"up"}, 200);
+				});
 	}
+	
 	
 	if (task.resource_id == member_id)
 	{
@@ -448,14 +476,13 @@ function makeTaskMarkup( task, isInWorkList, showStatusSelect)
 		}
 	}
 	
-	var html = '<div class="' + note_class + '"><div class="taskNumbers">'
-		+ reported_time ;
-		
-
-	html += '<br style="clear:both" /></div><div id="description-for-' 
-		+ task.task_id + '" class="taskDetails">' + task.description  +'</div></div>';
+	var markup = $('<div class="' + note_class + '"/>').append( title_bar).append('<div id="description-for-' 
+	+ task.task_id + '" class="taskDetails">' + task.description  +'</div>');
 	
-	return html;
+	markup.children('.taskNumbers').append('<br style="clear:both" />');
+		
+	
+	return markup;
 }
 
 /**
@@ -528,23 +555,22 @@ function makePersonMarkup( person, listName)
  */
 function addTaskToList( task, listName)
 {
-	var item = createTaskListItem( task, listName != '#sprintTasks');
+	var item = createTaskListItem( task);
 	item.appendTo( listName);
 }
 
 /**
- * Create a <li> element that will hold the html markup for a taks. The created element will have id 'container-for-<n>' with <n> a task id.
+ * Create a <li> element that will hold the html markup for a task. The created element will have id 'container-for-<n>' with <n> a task id.
  * @param task
  * @returns
  */
-function createTaskListItem( task, showStatusSelect)
+function createTaskListItem( task)
 {
 	return $('<li/>', 
 			{
 				'class': 'taskNote', 
 				'id':'container-for-' + task.task_id, 
-				'html':makeTaskMarkup( task, isTaskEstimateable(member_id, task),
-						                     showStatusSelect )
+				'html':makeTaskMarkup( task, isTaskEstimateable(member_id, task))
 			}
 
 		);
@@ -599,6 +625,7 @@ function submitTaskChanges( newValues, allowMove) {
 	if (changedEstimates) {
 		newValues.spent = $('#container-for-'+task_id+' #spent').val();
 		newValues.estimate = $('#container-for-'+task_id+' #estimate').val();
+		newValues.ref_date = $('#container-for-'+task_id+' #ref-date').val();
 	}
 
 	var query = '?action=move&' + $.param( newValues);
@@ -607,7 +634,7 @@ function submitTaskChanges( newValues, allowMove) {
 			function (task)
 			{
 				currentTasks['x'+task.task_id] = task;
-				$("#container-for-" + task.task_id).html( makeTaskMarkup( task, isTaskEstimateable(member_id, task), true));
+				$("#container-for-" + task.task_id).html( makeTaskMarkup( task, isTaskEstimateable(member_id, task)));
 				var target = newValues.status + "List";
 				if (worksOnTask(member_id, task)) target = "myTasks"; 
 				if (allowMove) $("#container-for-" + task.task_id).prependTo( "#" + target);				

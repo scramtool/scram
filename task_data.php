@@ -85,19 +85,27 @@ function print_single_task( $task_id)
 	print json_encode($task_info);
 }
 
-function update_report( $task_id, $estimate, $spent)
+function update_report( $task_id, $ref_date, $estimate, $spent)
 {
     global $database;
+    $task_id = (int)$task_id;
+    $estimate = (int)$estimate;
+    $spent = (int)$spent;
+    
+    $ref_date = "'" . $database->escape( $ref_date). "'";
     $log= new Log( $database);
     $log->estimate($task_id, $estimate, $spent);
     
-    $success = $database->exec("INSERT INTO report(task_id, resource_id, date, burnt, estimate) SELECT $task_id, resource_id, NOW(), $spent, $estimate FROM task WHERE task_id = $task_id");
+    // insert a new report into the database, but if a report for this task,date,resource already existed, only update the values. 
+    $success = $database->exec(
+            "INSERT INTO report(task_id, resource_id, date, burnt, estimate) SELECT $task_id, resource_id, $ref_date, $spent, $estimate FROM task WHERE task_id = $task_id " .
+            "ON DUPLICATE KEY UPDATE burnt = VALUES( burnt), estimate = VALUES( estimate)");
     return $success;
 }
 
-function handle_report( $task_id, $estimate, $spent)
+function handle_report( $task_id, $ref_date, $estimate, $spent)
 {
-	if (update_report($task_id, $estimate, $spent))
+	if (update_report($task_id, $ref_date, $estimate, $spent))
 	{
 		print_single_task( $task_id);
 	}
@@ -111,7 +119,7 @@ function handle_report( $task_id, $estimate, $spent)
  * @param unknown $status The new status of the task
  * @param unknown $owner The person performing the move.
  */
-function handle_move( $task_id, $status, $owner, $estimate = null, $spent = null)
+function handle_move( $task_id, $status, $owner, $ref_date, $estimate = null, $spent = null)
 {
 	global $database;
 	$task_id = $database->escape($task_id);
@@ -119,7 +127,11 @@ function handle_move( $task_id, $status, $owner, $estimate = null, $spent = null
 	
 	if (isset($estimate) && isset( $spent))
 	{
-	    update_report( $task_id, $estimate, $spent);    
+	    if (!isset($ref_date))
+	    {
+	        $ref_date =  date('Y-m-d');
+	    }
+	    update_report( $task_id, $ref_date, $estimate, $spent);    
 	}
 	
 	if (isset( $owner))
@@ -225,12 +237,12 @@ if (isset($_GET['action']))
 	switch ($_GET['action'])
 	{
 	case 'report':
-		make_global( $_GET, Array('task_id', 'estimate', 'spent'));
-		handle_report($task_id, $estimate, $spent);
+		make_global( $_GET, Array('ref_date','task_id', 'estimate', 'spent'));
+		handle_report($task_id, $ref_date, $estimate, $spent);
 		break;
 	case 'move':
-		make_global( $_GET, Array('task_id', 'status', 'owner', 'estimate', 'spent'));
-		handle_move( $task_id, $status, $owner, $estimate, $spent);
+		make_global( $_GET, Array('task_id', 'status', 'owner', 'ref_date', 'estimate', 'spent'));
+		handle_move( $task_id, $status, $owner, $ref_date, $estimate, $spent);
 		break;
 	case 'add':
 		handle_add( $_GET);
