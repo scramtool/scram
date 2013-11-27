@@ -32,7 +32,6 @@ require_once 'get_sprint_id.inc.php';
 <script type="text/javascript" src="scripts/charts.min.js"></script>
 <script type="text/javascript" src="scripts/scram-charts.js"></script>
 <script type="text/javascript" src="scripts/jquery.contextMenu.js"></script>
-<script type="text/javascript" src="scripts/jquery.ui.position.js"></script>
 
 <script type="text/javascript">
 var member_id = <?=$member_id?>;

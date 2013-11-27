@@ -13,6 +13,18 @@ body {
 	margin: 0;
 }
 
+.overlay
+{
+	border-radius: 0 0 12px 12px;
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    bottom: -1px;
+    right: -1px;
+    color: #000000;
+    z-index: 1;
+    float:none;
+}
 .taskNote
 {
 	float:left;
@@ -79,6 +91,7 @@ body {
 	text-align: center; 
 	font-size: 120%;
 	overflow: hidden;
+	position: relative;
 }
 
 .yellowNote .taskNumbers
@@ -86,18 +99,28 @@ body {
 	background-color: #CCCC7A;
 }
 
+.yellowNote .overlay
+{
+	background-color: #B0B060;
+}
+
 .greenNote .taskNumbers
 {
 	background-color: #B1CCAB;
 }
 
-.taskNumbers form
+ .greenNote .overlay
 {
-	margin: 2px 0px 2px 0px;
+	background-color: #98B090;
+}
+
+.taskNumberForm
+{
+	margin: 1px 5px;
 	float:left;
 }
 
-.taskNumbers div
+.taskNumbers *
 {
 	float:left;
 }
@@ -151,7 +174,15 @@ body {
 	height: 30px; 
 }
 
-.submitReportButton, .dailyRation, .zoomTaskButton
+.submitReportButton
+{
+	font-size:50%;
+	vertical-align: middle;
+	height: 2em;
+	width: 1em;
+}
+
+.dailyRation
 {
 	font-size:90%;
 	vertical-align: middle;
@@ -162,7 +193,6 @@ body {
 .changed {
 	background-color: orange;
 }
-
 
 .estimate
 {

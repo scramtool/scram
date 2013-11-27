@@ -16,9 +16,9 @@ class wiky {
 	public function __construct($analyze=false) {
 		$this->patterns=array(
 			// Headings
-			"/^==== (.+?) ====$/m",						// Subsubheading
-			"/^=== (.+?) ===$/m",						// Subheading
-			"/^== (.+?) ==$/m",						// Heading
+			"/^====(.+?)====$/m",						// Subsubheading
+			"/^===(.+?)===$/m",						// Subheading
+			"/^==(.+?)==$/m",						// Heading
 	
 			// Formatting
 			"/\'\'\'\'\'(.+?)\'\'\'\'\'/s",					// Bold-italic
