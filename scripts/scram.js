@@ -1,5 +1,5 @@
 //
-//  Copyright (C) 2012 Danny Havenith
+//  Copyright (C) 2012, 2013 Danny Havenith
 //
 //  Distributed under the Boost Software License, Version 1.0. (See
 //  accompanying file LICENSE_1_0.txt or copy at
@@ -20,6 +20,19 @@ var placeholderCounter = 0;
  * turns this array into a sparse map.
  */
 var currentTasks = new Array();
+
+
+/**
+ * Get the task with the given id from the global array currentTasks.
+ * This function encodes the custom to prepend the task id with 'x' in the
+ * array, so that the key is interepreted as a string and not a numerical index.
+ * @param id
+ * @returns
+ */
+function getTask( id)
+{
+	return currentTasks['x'+id];
+}
 
 /**
  * Load all tasks of a particular sprint, fill the global array currentTasks and refresh the UI.
@@ -203,24 +216,6 @@ function submitEstimate( )
 }
 
 /**
- * This event handler is called when the state select of a task changes. It will submit the new state of the task to the server and may 
- * submit the estimate values if they were changed by the user.
- * 
- * @returns {Boolean}
- */
-function submitState( )
-{
-	var obj_id = "#" + $(this).attr('id');
-	$(this).change(function(){}); // do nothing on subsequent changes.
-	var new_status = $(obj_id + " option:selected").val();
-	var task_id = obj_id.substring(19);
-		
-	var newValues = {'task_id':task_id, 'status': new_status};
-	submitTaskChanges( newValues, true);
-	return false;
-}
-
-/**
  * submit a change in the a tasks text to the server side.
  * This function returns the markup for a wait-icon and returns before the request is completed. After the request completes
  * an element with name 'description-for-<n>' (with <n> the task id) will get updated with the accepted task text.
@@ -234,6 +229,7 @@ function submitText( value, settings)
      $.getJSON( changeTextUrl + '?id=' + settings.submitdata.task_id + '&text=' + encodeURIComponent(value),
 			function (taskText)
 			{
+    	 		currentTasks['x'+taskText.task_id].description = taskText.text;
 				$("#description-for-" + taskText.task_id).html( taskText.text);
 			});
      
@@ -261,6 +257,13 @@ function makeEditable( index, value)
     });
 }
 
+/**
+ * Given a container name (the name of a <li> item for a task), extract the task id.
+ * This function assumes a specific format of the container name, such as 
+ * 'container-for-<task_id>'.
+ * @param containerId
+ * @returns numerical task id.
+ */
 function containerIdToTaskId( containerId)
 {
 	// assume the container has an id of the form
@@ -269,17 +272,117 @@ function containerIdToTaskId( containerId)
 	return containerId.substring(14);
 }
 
+/**
+ * Create the markup for a task detail form.
+ * At some point I should probably merge this code with that of makeTaskMarkup.
+ * 
+ * @param task
+ * @returns {String} html for the task form.
+ */
+function makeTaskFormMarkup( task)
+{
+	var today = new Date();
+	var report_date = Date.parse( task.report_date);
+	var today_string = today.toString( "yyyy-MM-dd");
+
+	if (isOnSameDay( report_date, today))
+	{
+		burnt = task.burnt;
+	}
+	else
+	{
+		burnt = 0;
+	}
+	
+	var html = 
+'	<form id="form-for-' + task.id + '">'+
+'	<div id="taskForm" class="yellowNote">'+
+'	<div class="taskNumbers">'+
+'	<div>'+
+'	    <input type="text" size="20" id="member_name" name="member_name" class="taskOwner" value="' + task.name+ '"/>'+
+'	</div>'+
+'	<div>'+
+'	    <input type="hidden" id="sprint_id" name="sprint_id" value="' + sprint_id+ '">'+
+'	    <input type="hidden" id="id" name = "id" value="' + task.task_id+ '">'+
+'	    <input type="hidden" id="estimate-original" name = "estimate-original" value="' + task.estimate+ '"/>'+
+'	    <input type="hidden" id="spent-original" name = "spent-original" value="' + burnt+ '"/>'+
+'       <input type="hidden" name="ref_date" id="ref-date" value="' + today_string + '"/>' + 
+'	    <label for="estimate">left:</label>'+
+'	    <input type="text" id="estimate" name = "estimate" class="estimate positive-integer show-changes" value="' + task.estimate+ '">'+
+'	    <label for="spent">&nbsp;spent today:</label>'+
+'	    <input type="text" id="spent" name="spent" class="estimate positive-integer show-changes" value="' + burnt+ '">'+
+'	</div>'+
+'	</div>'+
+'	<textarea cols="50" class="taskDescription" id="description" name="description" >' + task.description + '</textarea>'+
+'	<br style="clear:both" />'+
+'	</div>'+
+'	<div class="smallChart" style="width:400px;height:200px" id="taskBurnDown" ></div>'+
+'	</form>'
+;
+	return html;
+}
+
+/**
+ * This function takes a task object fresh from the server and gives its html rendering
+ * a place in one of the sections on the task board.
+ * @param task
+ */
+function updateTask(task)
+{
+	currentTasks['x'+task.task_id] = task;
+	
+	// can we find the <li>-item that should contain the task, if not create one
+	var container = $("#container-for-" + task.task_id);
+	if (container.length != 0)
+	{
+		container.html( makeTaskMarkup( task, isTaskEstimateable(member_id, task)));
+	}
+	else {
+		container = createTaskListItem( task);
+	}
+	
+	// determine in which section to place the <li>
+	var target = task.status + "List";
+	if (worksOnTask(member_id, task)) target = "myTasks";
+	
+	// if the task is not in the right container, we move it there
+	if (container.parent("#" + target).length == 0) {
+		container.prependTo( "#" + target);				
+	}
+	setAdvancedUIBehaviour();
+}
+
+function postTaskUpdates( form)
+{
+	var postData = form.serialize();
+	$.post( taskListUrl + "?action=update", postData, updateTask, "json");
+}
+
 function showTaskDialog()
 {
 	var id = containerIdToTaskId($(this).attr('id'));
-	var url = 'task_form.php?task_id=' + id;
+	var taskForm = makeTaskFormMarkup(getTask(id));
 	if (typeof theModalDialog == 'undefined') {
 		theModalDialog = $("<div />");
 	}
-	theModalDialog.html("");
-	theModalDialog.load(url).dialog({
-		modal : true
+	theModalDialog.html(taskForm);
+	theModalDialog.dialog({
+		modal : true,
+		width : 512,
+		height: 400,
+		buttons: [{ text:"OK", click: function (){
+			postTaskUpdates( $(this).find('form'));
+			$(this).dialog( 'close');
+			}}]
 	});
+	setAdvancedUIBehaviour();
+	loadTaskCharts( sprint_id, id, null, 'taskBurnDown');
+	$( "#member_name" ).autocomplete({
+		source: "names.php",
+		minLength: 1
+		});	
+
+	return true;
 }
 
 function menuClicked( key, options)
