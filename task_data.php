@@ -198,7 +198,7 @@ function handle_add( $arguments)
 	$description = $database->escape(get_if_defined($arguments, 'description'));
 	$estimate	 = $database->escape(get_if_defined($arguments, 'estimate', 8));
 	$sprint_id 	 = $database->escape(get_if_defined($arguments, 'sprint_id'));
-	$name		 = $database->escape(get_if_defined($arguments, 'member_name', 'Nobody'));
+	$name		 = $database->escape(get_if_defined($arguments, 'member_name', ''));
 	$is_late	 = $database->escape(get_if_defined($arguments, 'is_late', false));
 	$placeholder = get_if_defined($arguments, 'placeholder', 0);
 	
@@ -223,6 +223,39 @@ function handle_add( $arguments)
 	$task_info['placeholder'] = $placeholder;
 	
 	print json_encode($task_info);
+}
+
+function handle_update( $arguments)
+{
+    global $database;
+
+    $description = $database->escape(get_if_defined($arguments, 'description'));
+    $id          = $database->escape(get_if_defined($arguments, 'id'));
+    $ref_date    = $database->escape(get_if_defined($arguments, 'ref_date'));
+    $estimate	 = $database->escape(get_if_defined($arguments, 'estimate', 8));
+    $sprint_id 	 = $database->escape(get_if_defined($arguments, 'sprint_id'));
+    $name		 = $database->escape(get_if_defined($arguments, 'member_name', ''));
+    $is_late	 = $database->escape(get_if_defined($arguments, 'is_late', false));
+    $placeholder = get_if_defined($arguments, 'placeholder', 0);
+
+    $member_id = get_user_id( $database, $name);
+
+    // insert a task into the database. A task id will be created automatically, so we need to retrieve that.
+    $database->exec("UPDATE task SET resource_id = $member_id, description = '$description' WHERE task_id = $id");
+
+    if (isset($estimate) && isset( $spent))
+    {
+        if (!isset($ref_date))
+        {
+            $ref_date =  date('Y-m-d');
+        }
+        update_report( $task_id, $ref_date, $estimate, $spent);
+    }
+    
+    $task_info = $database->get_single_result( get_task_query( 0, $id));
+    $task_info['placeholder'] = $placeholder;
+
+    print json_encode($task_info);
 }
 
 
@@ -253,6 +286,9 @@ if (isset($_GET['action']))
 	case 'csv':
 		print_task_table_csv( $sprint_id);
 		break;
+	case 'update':
+	    handle_update( $_POST);
+	    break;
 	}
 }
 else 
