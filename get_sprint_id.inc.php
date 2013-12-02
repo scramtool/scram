@@ -12,7 +12,7 @@
  * 
  */
 
-$sprint_id = 24;
+$sprint_id = 25;
 if (isset( $_GET['sprint_id']))
 {
 	$sprint_id = $_GET['sprint_id'];
