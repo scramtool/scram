@@ -136,7 +136,7 @@ function update_report( $task_id, $ref_date, $estimate, $spent)
     // insert a new report into the database, but if a report for this task,date,resource already existed, only update the values. 
     $success = $database->exec(
             "INSERT INTO report(task_id, resource_id, date, burnt, estimate) SELECT $task_id, resource_id, $ref_date, $spent, $estimate FROM task WHERE task_id = $task_id " .
-            "ON DUPLICATE KEY UPDATE burnt = VALUES( burnt), estimate = VALUES( estimate)");
+            "ON DUPLICATE KEY UPDATE burnt = VALUES( burnt), estimate = VALUES( estimate), reason='estimate'");
     return $success;
 }
 
