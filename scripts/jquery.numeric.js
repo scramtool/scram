@@ -218,8 +218,8 @@ $.fn.numeric.keyup = function(e)
 		// set the value and prevent the cursor moving to the end
 		this.value = val;
 		
-		// don't change selection if the key was a tab-key.
-		if (e.which != 9) $.fn.setSelection(this, carat);
+		// don't change selection if the key was a tab-key (or shift-tab).
+		if (e.which != 9 && e.which != 16) $.fn.setSelection(this, carat);
 	}
 }
 
