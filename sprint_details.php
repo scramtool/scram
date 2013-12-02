@@ -64,6 +64,7 @@ $(document).ready(function() {
 	$(".firstToFocus").focus();
 	$( "#member_name" ).autocomplete({
 		source: "names.php",
+		autoFocus: true,
 		minLength: 1
 		});	
 	$(".chartOption").change( function (event) {
@@ -138,8 +139,7 @@ $(document).ready(function() {
 										id="estimate" class="estimate positive-integer" />
 									<label for="member_name">Person:&nbsp;</label>
 									<input type="text" id="member_name" name="member_name" class="member-name" />
-									<label for="is_late">Late task:&nbsp;</label>
-									<input type="checkbox" id="is_late" name="is_late">
+									<input type="hidden" id="is_late" name="is_late" value="0">
 									<button class="newTaskButton">Submit a new task</button>
 								</form>
 							</div>

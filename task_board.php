@@ -47,6 +47,7 @@ $(document).ready(function() {
     $(".positive-integer").numeric({ decimal: false, negative: false }, function() { alert("Positive integers only"); this.value = ""; this.focus(); });
  	$('#names').change( function (value) {
 		member_id = $(this).val();
+		member_name = $(this).children("option:selected").text()
 		refreshTaskUi();
 		filterTasks($('#showAll').prop('checked'));
 	});

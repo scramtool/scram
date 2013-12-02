@@ -148,21 +148,21 @@ function refreshSprintDetails( sprint)
 }
 
 /**
- * This function is called when the submit new task-button is pressed. $(this) references the button.
- * The button is supposed to be in a form. This function will retreive all values in that form and create an
- * ajax GET-request that should add the task to the database.
- * In the meantime, a representation of the task is added to the global variable 'currentTasks' and a first representation
- * is preprended to the list (<ul>) element with id "sprintTasks".
+ * Submit a form with data for a new task to the server.
+ * If the server accepts the data, a new task object will be asynchronously returned. This task object 
+ * is added to the global array currentTasks and then given to the callback parameter.
  * 
- * Beware: this function makes quite a few assumptions about the form that holds the submit-button.
- * @returns {Boolean}
+ * Note that the form from which the data is submitted should have inputs with
+ * exactly the right names.
+ * 
+ * @param form
  */
-function submitNewTask()
+function submitNewTaskForm(form, callback)
 {
 	var query = "";
 	
 	var task = new Array();
-	$(this).parent().children("input").each( 
+	form.find("input, textarea").each( 
 			function(index, element) {
 				value =  encodeURIComponent( element.value);
 				name = element.name;
@@ -171,29 +171,51 @@ function submitNewTask()
 				});
 	
 	if (!task.estimate) task.estimate = 8;
-	if (task.description.length != 0)
+	if (task.description && task.description.length != 0)
 	{
 		query += '&sprint_id=' + sprint_id;
-
-		$.getJSON( taskListUrl + '?action=add' + query,
-				function (task)
-				{
-					var table = $('#taskTable').dataTable();
-					table.fnAddData([
-					                 task.task_id, task.sprint_id, 
-					                 task.description, task.status,
-					                 task.resource_id, "",task.name,
-					                 0, task.estimate, task.estimate, task.estimate
-					                 ]);
-				});
+		$.getJSON( taskListUrl + '?action=add' + query, function (task) {
+				currentTasks[ 'x'+task.task_id] = task;
+				if (callback) {
+					callback(task);
+				}
+			}
+		);
 	}
+}
+
+/**
+ * This function is called when the submit new task-button is pressed in the sprint details page. 
+ * $(this) references the button.
+ * The button is supposed to be in a form. This function will retreive all values in that form and create an
+ * ajax GET-request that should add the task to the database.
+ * 
+ * Beware: this function makes quite a few assumptions about the form that holds the submit-button.
+ * @returns {Boolean}
+ */
+function submitNewTask( )
+{
+	submitNewTaskForm( $(this).parent(), 
+			function (task)
+			{
+				var table = $('#taskTable').dataTable();
+				table.fnAddData([
+				                 task.task_id, task.sprint_id, 
+				                 task.description, task.status,
+				                 task.resource_id, "",task.name,
+				                 0, task.estimate, task.estimate, task.estimate
+				                 ]);
+			});
+
 	// clear the form and bring the cursor to the first input.
 	$('form input').val("");
 	$('form #estimate').val("8");
 	$('.firstToFocus').focus();
 	
 	return false;
+
 }
+
 
 /**
  * Submit the estimates that have been filled in by the user.
@@ -299,10 +321,11 @@ function makeTaskFormMarkup( task)
 '	<div id="taskForm" class="yellowNote">'+
 '	<div class="taskNumbers">'+
 '	<div>'+
-'	    <input type="text" size="20" id="member_name" name="member_name" class="taskOwner" value="' + task.name+ '"/>'+
+'	    <input type="text" size="20" id="member_name" name="member_name" class="memberName" value="' + task.name+ '"/>'+
 '	</div>'+
 '	<div>'+
 '	    <input type="hidden" id="sprint_id" name="sprint_id" value="' + sprint_id+ '">'+
+'	    <input type="hidden" id="status" name="status" value="' + task.status + '">'+
 '	    <input type="hidden" id="id" name = "id" value="' + task.task_id+ '">'+
 '	    <input type="hidden" id="estimate-original" name = "estimate-original" value="' + task.estimate+ '"/>'+
 '	    <input type="hidden" id="spent-original" name = "spent-original" value="' + burnt+ '"/>'+
@@ -316,7 +339,6 @@ function makeTaskFormMarkup( task)
 '	<textarea cols="50" class="taskDescription" id="description" name="description" >' + task.description + '</textarea>'+
 '	<br style="clear:both" />'+
 '	</div>'+
-'	<div class="smallChart" style="width:400px;height:200px" id="taskBurnDown" ></div>'+
 '	</form>'
 ;
 	return html;
@@ -361,7 +383,10 @@ function postTaskUpdates( form)
 function showTaskDialog()
 {
 	var id = containerIdToTaskId($(this).attr('id'));
-	var taskForm = makeTaskFormMarkup(getTask(id));
+	var taskForm = $(makeTaskFormMarkup(getTask(id)));
+	taskForm.append('<div class="smallChart" style="width:400px;height:200px" id="taskBurnDown" ></div>');
+	
+	
 	if (typeof theModalDialog == 'undefined') {
 		theModalDialog = $("<div />");
 	}
@@ -375,14 +400,88 @@ function showTaskDialog()
 			$(this).dialog( 'close');
 			}}]
 	});
+	
+	// select all when entering a form input
+	theModalDialog.find('textarea, input').focus( function (){$(this).select();});
+	// focus on the first field.
+	theModalDialog.find('#member_name').focus();
+	
 	setAdvancedUIBehaviour();
 	loadTaskCharts( sprint_id, id, null, 'taskBurnDown');
-	$( "#member_name" ).autocomplete({
-		source: "names.php",
-		minLength: 1
-		});	
 
 	return true;
+}
+
+function createEmptyTask()
+{
+	var task = {
+			"sprint_id": sprint_id, 
+			"description":"",
+			"status":"",
+			"resource_id":member_id,
+			"story":"",
+			"name": member_name,
+			"estimate":"0",
+			"burnt":"0"
+		};
+	return task;
+}
+
+/**
+ * Create a dependency between two numerical inputs where if the value of one ('destination') changes, 
+ * its delta will be subtracted from the other ('source'). If source changes, those changes will not influence 
+ * 'destination'. 
+ * @param source
+ * @param destination
+ */
+function siphon( source, destination)
+{
+	// this makes use of the fact that the attribute 'value' contains the original value while the 
+	// _property_ 'value' contains the new value.
+	destination.change( function(){
+		var oldValue = $(this).attr('value');
+		var newValue = $(this).prop('value');
+		if (newValue != oldValue) {
+			var delta = newValue - oldValue;
+			destination.attr('value', newValue);
+			source.prop( 'value', Math.max( 0, source.prop('value') - delta));
+			source.change();
+		};
+	});
+}
+
+function showSplitTaskDialog()
+{
+	var id = containerIdToTaskId($(this).attr('id'));
+	var sourceTask = getTask( id);
+	var destinationTask = createEmptyTask();
+	destinationTask.status = sourceTask.status;
+	destinationTask.description = sourceTask.description;
+	
+	var sourceTaskDiv = $('<div/>').addClass('sideBySideTask').html( makeTaskFormMarkup( sourceTask));
+	var destinationTaskDiv = $('<div/>').addClass('sideBySideTask').html(makeTaskFormMarkup( destinationTask));
+	
+	var dialog = $('<div/>').append( sourceTaskDiv).append( destinationTaskDiv);
+	dialog.dialog({
+		modal : true,
+		width : 960,
+		height: 200,
+		buttons: [
+		          { 
+		        	  text:"OK", 
+		        	  click: function () {
+		        		  postTaskUpdates( sourceTaskDiv.find('form'));
+		        		  submitNewTaskForm( destinationTaskDiv.find('form'), updateTask);
+		        		  $(this).dialog( 'close');
+		        	  }
+		          }
+		          ]
+	});	
+	//destinationTaskDiv.toggle('slide');
+	dialog.find('textarea, input').focus( function (){$(this).select();});
+	destinationTaskDiv.find('#member_name').focus();
+	siphon( sourceTaskDiv.find('#estimate'), destinationTaskDiv.find('#estimate'));
+	setAdvancedUIBehaviour();
 }
 
 function menuClicked( key, options)
@@ -421,7 +520,7 @@ function addMenus()
 				},
 				"icon": "paste"
 			},
-			"split" : { name: "Split"},
+			"split" : { name: "Split", callback : showSplitTaskDialog},
 			"details": { name: "Details", callback: showTaskDialog }
 		
 		}
@@ -454,6 +553,12 @@ function setAdvancedUIBehaviour()
 	$(".positive-integer").numeric({ decimal: false, negative: false }, function() { 
 		alert("Positive integers only"); this.value = ""; this.focus(); 
 		});
+	$( ".memberName" ).autocomplete({
+		source: "names.php",
+		autoFocus: true,
+		minLength: 1
+		});	
+	
 	addMenus();
 	$(".show-changes").change(changedMarkup);
 }

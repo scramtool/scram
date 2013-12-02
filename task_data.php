@@ -29,6 +29,11 @@ class Task
 	var $resourcename;
 }
 
+/**
+ * print the data for all tasks of the given sprint as a json-encoded array of
+ * objects.
+ * @param unknown $sprint_id
+ */
 function print_task_data( $sprint_id)
 {
 	global $database;
@@ -40,6 +45,12 @@ function print_task_data( $sprint_id)
 	print json_encode($tasks);
 }
 
+/**
+ * This function returns the data for all tasks of a given sprint in a format that is
+ * compatible with Datatable.js.
+ * 
+ * @param unknown $sprint_id
+ */
 function print_task_table_data( $sprint_id)
 {
     global $database;
@@ -51,7 +62,14 @@ function print_task_table_data( $sprint_id)
     $result['aaData'] = array_map( "array_values", $tasks);
     print json_encode($result);
 }
-
+/**
+ * print a given table as headers.
+ * 
+ * The table must be an array of arrays, the header is an array of values that comprises the first row.
+ * 
+ * @param unknown $headers
+ * @param unknown $table
+ */
 function print_csv( $headers, $table)
 {
 	$outstream = fopen("php://output", 'w');
@@ -63,6 +81,10 @@ function print_csv( $headers, $table)
 	fclose( $outstream);
 }
 
+/**
+ * print the data for all tasks of a sprint in csv format.
+ * @param unknown $sprint_id
+ */
 function print_task_table_csv( $sprint_id)
 {
     global $database;
@@ -78,6 +100,10 @@ function print_task_table_csv( $sprint_id)
 	print_csv( $headers, $tasks);
 }
 
+/**
+ * print information of the given task (id) as a json-encoded object.
+ * @param unknown $task_id
+ */
 function print_single_task( $task_id)
 {
 	global $database;
@@ -85,6 +111,18 @@ function print_single_task( $task_id)
 	print json_encode($task_info);
 }
 
+/**
+ * Add the given report data to the database.
+ * 
+ * This function will either create a new report with the given values, or--if a report on this
+ * task for the given date already exists--update the existing report with the given values.
+ * @param unknown $task_id id of task to update
+ * @param unknown $ref_date date of the report
+ * @param unknown $estimate new estimate of remaining time on the task
+ * @param unknown $spent how much time was spent in the previous reporting period
+ * 
+ * @return value can be interpreted as a boolean indicating whether the update succeeded.
+ */
 function update_report( $task_id, $ref_date, $estimate, $spent)
 {
     global $database;
@@ -95,7 +133,6 @@ function update_report( $task_id, $ref_date, $estimate, $spent)
     $ref_date = "'" . $database->escape( $ref_date). "'";
     $log= new Log( $database);
     $log->estimate($task_id, $estimate, $spent);
-    
     // insert a new report into the database, but if a report for this task,date,resource already existed, only update the values. 
     $success = $database->exec(
             "INSERT INTO report(task_id, resource_id, date, burnt, estimate) SELECT $task_id, resource_id, $ref_date, $spent, $estimate FROM task WHERE task_id = $task_id " .
@@ -103,6 +140,16 @@ function update_report( $task_id, $ref_date, $estimate, $spent)
     return $success;
 }
 
+/**
+ * Handle a report.
+ * A report consists of a task id, a date, an estimate of the time left on a task and a report on how 
+ * much time was spent on a task in the previous period (i.e. day).
+ * This function will call update_report() and then print the resulting task information.
+ * @param unknown $task_id
+ * @param unknown $ref_date
+ * @param unknown $estimate
+ * @param unknown $spent
+ */
 function handle_report( $task_id, $ref_date, $estimate, $spent)
 {
 	if (update_report($task_id, $ref_date, $estimate, $spent))
@@ -197,15 +244,17 @@ function handle_add( $arguments)
 	
 	$description = $database->escape(get_if_defined($arguments, 'description'));
 	$estimate	 = $database->escape(get_if_defined($arguments, 'estimate', 8));
+	$burnt       = $database->escape(get_if_defined($arguments, 'burnt', 0));
 	$sprint_id 	 = $database->escape(get_if_defined($arguments, 'sprint_id'));
 	$name		 = $database->escape(get_if_defined($arguments, 'member_name', ''));
-	$is_late	 = $database->escape(get_if_defined($arguments, 'is_late', false));
+	$status      = $database->escape(get_if_defined($arguments, 'status', 'toDo'));
+	$is_late	 = $database->escape(get_if_defined($arguments, 'is_late', true));
 	$placeholder = get_if_defined($arguments, 'placeholder', 0);
 	
 	$member_id = get_user_id( $database, $name);
 	
 	// insert a task into the database. A task id will be created automatically, so we need to retrieve that.
-	$database->exec("INSERT INTO task(sprint_id, description, resource_id) VALUES ( $sprint_id, '$description', $member_id)");
+	$database->exec("INSERT INTO task(sprint_id, description, resource_id, status) VALUES ( $sprint_id, '$description', $member_id, '$status')");
 	$id = $database->last_inserted_id();
 	
 	if ($is_late)
@@ -217,7 +266,7 @@ function handle_add( $arguments)
 		// find a random ( :) ) date that is earlier than the first sprint date.
 		$date_expression = "'1969-10-18'";	
 	}
-    $database->exec("INSERT INTO report( task_id, resource_id, burnt, estimate, date) VALUES( $id, 0, 0, $estimate, $date_expression)");
+    $database->exec("INSERT INTO report( task_id, resource_id, burnt, estimate, date) VALUES( $id, 0, $burnt, $estimate, $date_expression)");
 	
 	$task_info = $database->get_single_result( get_task_query( 0, $id));
 	$task_info['placeholder'] = $placeholder;
@@ -225,23 +274,30 @@ function handle_add( $arguments)
 	print json_encode($task_info);
 }
 
+/**
+ * Handle an update request.
+ * Update requests contain information about a task and its latest report. Normally the data to which the report
+ * applies is also communicated (ref_date). This is to handle tricky situations like a UI that was updated before midnight,
+ * but an update that is sent after midnight.
+ * @param unknown $arguments
+ */
 function handle_update( $arguments)
 {
     global $database;
 
     $description = $database->escape(get_if_defined($arguments, 'description'));
-    $id          = $database->escape(get_if_defined($arguments, 'id'));
+    $task_id     = $database->escape(get_if_defined($arguments, 'id'));
     $ref_date    = $database->escape(get_if_defined($arguments, 'ref_date'));
     $estimate	 = $database->escape(get_if_defined($arguments, 'estimate', 8));
+    $spent       = $database->escape(get_if_defined($arguments, 'spent', 8));
     $sprint_id 	 = $database->escape(get_if_defined($arguments, 'sprint_id'));
     $name		 = $database->escape(get_if_defined($arguments, 'member_name', ''));
-    $is_late	 = $database->escape(get_if_defined($arguments, 'is_late', false));
     $placeholder = get_if_defined($arguments, 'placeholder', 0);
 
     $member_id = get_user_id( $database, $name);
 
     // insert a task into the database. A task id will be created automatically, so we need to retrieve that.
-    $database->exec("UPDATE task SET resource_id = $member_id, description = '$description' WHERE task_id = $id");
+    $database->exec("UPDATE task SET resource_id = $member_id, description = '$description' WHERE task_id = $task_id");
 
     if (isset($estimate) && isset( $spent))
     {
@@ -252,7 +308,7 @@ function handle_update( $arguments)
         update_report( $task_id, $ref_date, $estimate, $spent);
     }
     
-    $task_info = $database->get_single_result( get_task_query( 0, $id));
+    $task_info = $database->get_single_result( get_task_query( 0, $task_id));
     $task_info['placeholder'] = $placeholder;
 
     print json_encode($task_info);

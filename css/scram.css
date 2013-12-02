@@ -35,7 +35,13 @@ body {
 	height:200px;
 }
 
-
+/* style for side-by-side display of task forms. 
+** specifically for the task split dialog
+*/
+.sideBySideTask {
+	float: left;
+	margin: 4px;
+}
 .detailsBox {
   padding: 5px;
 }
@@ -159,7 +165,6 @@ body {
 	background-color: #DDFFD6;
 	border-color: #B1CCAB;
 }
-
 
 .purpleNote
 {
