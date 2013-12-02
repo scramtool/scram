@@ -24,7 +24,7 @@ var currentTasks = new Array();
 
 /**
  * Get the task with the given id from the global array currentTasks.
- * This function encodes the custom to prepend the task id with 'x' in the
+ * This function encodes the convention to prepend the task id with 'x' in the
  * array, so that the key is interepreted as a string and not a numerical index.
  * @param id
  * @returns
@@ -484,6 +484,45 @@ function showSplitTaskDialog()
 	setAdvancedUIBehaviour();
 }
 
+function containerIdToStatus( containerId)
+{
+	if (containerId == 'myTasks')
+	{
+		return 'inProgress';
+	}
+	else
+	{
+		// remove the last 4 characters, which we assume contain "List".
+		return containerId.slice( 0, -4);
+	}
+}
+
+function showNewTaskDialog()
+{
+	var destinationTask = createEmptyTask();
+	destinationTask.status = containerIdToStatus( $(this).children('ul').attr('id'));;
+	destinationTask.description = "New Task";
+
+	var dialog = $('<div/>').html(makeTaskFormMarkup( destinationTask));
+	dialog.dialog({
+		modal : true,
+		width : 512,
+		height: 240,
+		buttons: [
+		          { 
+		        	  text:"OK", 
+		        	  click: function () {
+		        		  submitNewTaskForm( $(this).find('form'), updateTask);
+		        		  $(this).dialog( 'close');
+		        	  }
+		          }
+		          ]
+	});	
+	dialog.find('textarea, input').focus( function (){$(this).select();});
+	dialog.find('#member_name').focus();
+	setAdvancedUIBehaviour();
+}
+
 function menuClicked( key, options)
 {
 	var obj_id = "#" + $(this).attr('id');
@@ -530,7 +569,7 @@ function addMenus()
 		selector: '.categoryContent',
 		callback : menuClicked,
 		items: {
-			'newTask' : { name: 'New Task'}
+			'newTask' : { name: 'New Task', callback : showNewTaskDialog}
 		}
 	});
 }
