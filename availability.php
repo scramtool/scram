@@ -1,6 +1,6 @@
 <?php
 //
-//  Copyright (C) 2012 Danny Havenith
+//  Copyright (C) 2012,2013 Danny Havenith
 //
 //  Distributed under the Boost Software License, Version 1.0. (See
 //  accompanying file LICENSE_1_0.txt or copy at
@@ -57,6 +57,8 @@ function change_availability( &$inputs)
 	$count = 0;
 	foreach ( $inputs as $key => $value)
 	{
+	    
+	    $value = intval( $value); // force intval to be numeric
 		if (preg_match('/k_(\d+)_(\d{4}-\d+-\d+)/', $key, $key_parts))
 		{
 			$insert_array[] = "($sprint_id, $key_parts[1], '$key_parts[2]', $value)";
@@ -67,8 +69,8 @@ function change_availability( &$inputs)
 	if ($count)
 	{
 		$insert_string = implode(',', $insert_array);
-		$database->exec( "DELETE FROM availability WHERE sprint_id = $sprint_id");
-		$database->exec( "INSERT INTO availability(sprint_id, resource_id, date, hours) VALUES $insert_string");
+		$database->exec( "INSERT INTO availability(sprint_id, resource_id, date, hours) VALUES $insert_string " .
+		        "ON DUPLICATE KEY UPDATE hours = VALUES( hours)");
 	}
 	
 	return get_availability( $inputs);

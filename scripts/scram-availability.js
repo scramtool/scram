@@ -1,5 +1,5 @@
 //
-//  Copyright (C) 2012 Danny Havenith
+//  Copyright (C) 2012,2013 Danny Havenith
 //
 //  Distributed under the Boost Software License, Version 1.0. (See
 //  accompanying file LICENSE_1_0.txt or copy at
@@ -28,9 +28,9 @@ function loadAvailability( sprint_id, callback)
  */
 function get_weekdays( sprint)
 {
-	result = new Array();
-	start = Date.parse( sprint.start_date);
-	end = Date.parse( sprint.end_date);
+	var result = new Array();
+	var start = Date.parse( sprint.start_date);
+	var end = Date.parse( sprint.end_date);
 	for (;start <= end; start.setDate( start.getDate()+1))
 	{
 		if (start.getDay() != 0 && start.getDay() != 6)
@@ -56,6 +56,28 @@ function formatDateHeader( date)
 	});
 	
 	return div;
+}
+
+/**
+ * This function does almost exactly the same as the changeMarkup() function in 
+ * scram.js: whenever a value in an input differs from its original value, it will get an
+ * additional style ('changed') to mark it so.
+ * 
+ * The difference between the two functions is that this one uses the value property/atrribute
+ * difference to determine the change, while changeMarkup() uses hidden fields with the original value.
+ * 
+ */
+function tableCellChangeMarkup()
+{
+	var oldValue = $(this).attr('value');
+	var newValue = $(this).prop('value');
+
+	if (oldValue != newValue) {
+		$(this).addClass('changed');
+	}
+	else {
+		$(this).removeClass( 'changed');
+	}
 }
 
 /**
@@ -87,10 +109,9 @@ function createAvailabilityTable( sprint_id, element_id, data)
 			var year = date.getFullYear();
 			
 			var key = 'k_' + id + "_" + year + '-' + month + '-' + day;
-			var val = (data['times'][key])?(data['times'][key]):"";
+			var val = parseInt(data['times'][key])?(data['times'][key]):"";
 			var td = $('<td />');
-			$("<input />").attr({'id':key,'name':key,'type':'text','class':"hourCell positive-integer dailyRation", 'value': val})
-//			$("<input />").data('id', key).data('type', 'text').data('style', 'hourCell positive-integer dailyRation')
+			$("<input />").attr({'id':key,'name':key,'type':'text','class':"hourCell positive-integer dailyRation show-internal-changes", 'value': val})
 				.appendTo( td);
 			td.appendTo( row);
 		});
@@ -105,13 +126,11 @@ function createAvailabilityTable( sprint_id, element_id, data)
 		$(this).children().filter(":input[type='submit']").attr('disabled','disabled');
 		var compressed= {'sprint_id': sprint_id, 'action':'post'};
 		
-		// collect all hourCell values that are non-trivial (not zero or empty).
-		$('.hourCell').each( function (index) {
+		// collect all hourCell values that were changed.
+		$('.hourCell').filter('.changed').each( function (index) {
 			var value = $(this).prop( 'value');
-			if ( parseInt(value) != 0 && value != '') {
-				var key = $(this).attr( 'id');
-				compressed[ key] = value; 
-			}
+			var key = $(this).attr( 'id');
+			compressed[ key] = value; 
 		});
 		
 		$.post( availabilityUrl, compressed, function (newData) {
@@ -120,6 +139,5 @@ function createAvailabilityTable( sprint_id, element_id, data)
 	});
 	$('#' + element_id).html('');
 	$('#' + element_id).append( form);
-	
-	
+	$('.show-internal-changes').change(tableCellChangeMarkup);
 }
