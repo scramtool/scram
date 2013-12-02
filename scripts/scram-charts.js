@@ -204,7 +204,7 @@ function drawCharts( chart_data, burnDownElement, burnUpElement, addAvailability
 	var lastDate;
 	$.each( chart_data.availability, function (index, avail){
 		lastDate = Date.parse(avail.date);
-		while( lastDate > days[indexInDaysArray]) {
+		while( lastDate >= days[indexInDaysArray]) {
 			cumulativeAvailability[indexInDaysArray++] = totalAvailability;
 		}
 		totalAvailability += parseFloat( avail.hours);
