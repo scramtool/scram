@@ -336,7 +336,7 @@ function makeTaskFormMarkup( task)
 '	    <input type="text" id="spent" name="spent" class="estimate positive-integer show-changes" value="' + burnt+ '">'+
 '	</div>'+
 '	</div>'+
-'	<textarea cols="50" class="taskDescription" id="description" name="description" >' + task.description + '</textarea>'+
+'	<textarea cols="40" class="taskDescription" id="description" name="description" >' + task.description + '</textarea>'+
 '	<br style="clear:both" />'+
 '	</div>'+
 '	</form>'
@@ -394,7 +394,7 @@ function showTaskDialog()
 	theModalDialog.dialog({
 		modal : true,
 		width : 512,
-		height: 400,
+		height: 500,
 		buttons: [{ text:"OK", click: function (){
 			postTaskUpdates( $(this).find('form'));
 			$(this).dialog( 'close');
@@ -464,8 +464,8 @@ function showSplitTaskDialog()
 	var dialog = $('<div/>').append( sourceTaskDiv).append( destinationTaskDiv);
 	dialog.dialog({
 		modal : true,
-		width : 960,
-		height: 200,
+		width : 920,
+		height: 240,
 		buttons: [
 		          { 
 		        	  text:"OK", 
