@@ -58,6 +58,44 @@ function formatDateHeader( date)
 	return div;
 }
 
+
+function updateTotal( container)
+{
+	var total = 0;
+	container.find('[data-scram-rowtotal]').each( function (index, element){
+		var val = parseInt( $(element).html());
+		if (!isNaN(val)) {
+			total += val;
+		}
+	});
+	container.find('[data-scram-total]').html( total);
+}
+
+function updateRowTotal( container, rownr) 
+{
+	var total = 0;
+	container.find('[data-scram-row="'+rownr+'"]').each( function (index, element){
+		var val = parseInt( element.value);
+		if (!isNaN(val)) {
+			total += val;
+		}
+	});
+	container.find('[data-scram-rowtotal="'+rownr+'"]').html( total);
+	updateTotal( container);
+}
+
+function updateColumnTotal( container, colnr) 
+{
+	var total = 0;
+	container.find('[data-scram-column="'+colnr+'"]').each( function (index, element){
+		var val = parseInt( element.value);
+		if (!isNaN(val)) {
+			total += val;
+		}
+	});
+	container.find('[data-scram-columntotal="'+colnr+'"]').html( total);
+}
+
 /**
  * This function does almost exactly the same as the changeMarkup() function in 
  * scram.js: whenever a value in an input differs from its original value, it will get an
@@ -78,6 +116,12 @@ function tableCellChangeMarkup()
 	else {
 		$(this).removeClass( 'changed');
 	}
+	
+	var table = $(this).closest("table");
+	var row = $(this).attr('data-scram-row');
+	var col = $(this).attr('data-scram-column');
+	updateRowTotal( table, row);
+	updateColumnTotal( table, col);
 }
 
 /**
@@ -92,17 +136,25 @@ function createAvailabilityTable( sprint_id, element_id, data)
 	var table = $("<table style='availability' />");
 	var dates = getWeekdays( data.sprint);
 	var header = $("<tr></tr>");
-	$("<th>name</th>").appendTo( header);
+	var colTotals = $("<tr></tr>");
+	$("<th>name</th><th>total</th>").appendTo( header);
+	$("<td>&nbsp;</td><td data-scram-total>&nbsp;</td>").appendTo( colTotals);
+	var colnr = 0;
 	$.each( dates, function (index, date){
 		var td = $("<th/>");
 		td.append( formatDateHeader( date));
 		td.appendTo( header);
+		$("<td class='estimate frozen'>0</td>").attr('data-scram-columntotal', colnr).appendTo( colTotals);
+		++colnr;
 	});
 	header.appendTo( table);
+	var rownr = 0;
 	$.each( data.resources, function (index, resource) {
 		var id = resource.resource_id;
 		var row = $("<tr />");
 		$("<td />").text( resource.name).appendTo( row);
+		$("<td/>").text('0').attr( {'data-scram-rowtotal': rownr, 'class':'rowTotal estimate frozen'}).appendTo( row);
+		var colnr = 0;
 		$.each( dates, function (index2, date){
 			var day = date.getDate();
 			var month = date.getMonth() + 1;
@@ -110,13 +162,20 @@ function createAvailabilityTable( sprint_id, element_id, data)
 			
 			var key = 'k_' + id + "_" + year + '-' + month + '-' + day;
 			var val = parseInt(data['times'][key])?(data['times'][key]):"";
-			var td = $('<td />');
-			$("<input />").attr({'id':key,'name':key,'type':'text','class':"hourCell positive-integer dailyRation show-internal-changes", 'value': val})
+			var td = $('<td />').css('text-align', 'right');
+			$("<input />").attr({'data-scram-row': rownr, 'data-scram-column': colnr, 'id':key,'name':key,'type':'text','class':"hourCell positive-integer dailyRation show-internal-changes", 'value': val})
 				.appendTo( td);
 			td.appendTo( row);
+			++colnr;
 		});
 		row.appendTo( table);
+		++rownr;
 	});
+	colTotals.appendTo( table);
+
+	for (var rowCounter = 0; rowCounter < rownr; ++rowCounter) updateRowTotal( table, rowCounter);
+	for (var colCounter = 0; colCounter < colnr; ++colCounter) updateColumnTotal( table, colCounter);
+	
 	var form = $('<form />').attr( { 'method':'POST', 'action':availabilityUrl + '?action=error'});
 	form.append(table);
 	$('<input />').attr( {'type':'submit', 'value':'Submit'}).appendTo( form);
