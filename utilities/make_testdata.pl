@@ -2,8 +2,8 @@
 use POSIX;
 use DateTime;
 
-$plandate = DateTime->new( year=> 2012, month => 8, day => 12);
-$startdate = DateTime->new( year=> 2012, month => 8, day => 13);
+$plandate = DateTime->new( year=> 1969, month => 10, day => 18);
+$startdate = DateTime->new( year=> 2015, month => 1, day => 28);
 $developer_count = 1;
 %developer_ids = {};
 $task_counter = 1;

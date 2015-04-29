@@ -131,6 +131,13 @@ function weekDaysBetween( date1, date2)
 	return counter;
 }
 
+function downloadChart( element) 
+{
+	var graph = "data:image/svg+xml;charset=utf-8," + encodeURIComponent( $('#'+ element).html());
+	window.open( graph);
+	return false;
+}
+
 /**
  * Given the burn up and -down data for the sprint, create a burn up and burn down chart.
  * This function creates four data series, two for each chart. Each data series consists of pairs (date, value).

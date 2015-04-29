@@ -31,6 +31,13 @@ function create_date_range_query( $sprint_id)
 EOT;
 }
 
+function get_sprint_array( )
+{
+	global $database;
+	$sprints = $database->get_result_table( "SELECT * FROM sprint", $headers, $table);
+	print csv_encode( $headers, $table);
+}
+
 function handle_get( $sprint_id)
 {
 	global $database;

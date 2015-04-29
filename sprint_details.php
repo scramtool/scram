@@ -8,7 +8,7 @@
 //
 
 require_once 'connect_db.inc.php';
-require_once 'get_username.inc.php';
+//require_once 'get_username.inc.php';
 require_once 'get_sprint_id.inc.php';
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -35,7 +35,7 @@ require_once 'get_sprint_id.inc.php';
 <link href="css/smoothness/jquery-ui-1.10.3.custom.min.css" rel="stylesheet" type="text/css" />
 
 <script type="text/javascript">
-var member_id = <?=$member_id?>;
+var member_id = -1;
 var member_name = '<?=$member_name?>';
 var need_identification = <?=$need_identification?1:0?>;
 var sprint_id = <?=$sprint_id?>;
@@ -105,13 +105,15 @@ $(document).ready(function() {
 							</h3>
 							<div class="categoryContent">
 								<div id='burndown' style="width:800px;height:400px" class="bigChart"><img class="centered" src="images/ajax-loader.gif"/></div>
+								<a href="burndown.svg" onClick="return downloadChart('burndown');" download="burndown.svg">Printable version</a>
 							</div>
 							<h3 class="categoryHeader">
 								<a href="#">Burn Up</a>
 							</h3>
 							<div class="categoryContent">
 								<div id='burnup' style="width:800px;height:400px" class="bigChart"><img class="centered" src="images/ajax-loader.gif"/></div>
-							</div>
+								<a href="burnup.svg" onClick="return downloadChart('burnup');" download="burnup.svg">Printable version</a>
+								</div>
 						<br style="clear:both"/>
 						</div>
 						</div>
