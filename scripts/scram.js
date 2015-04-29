@@ -118,7 +118,7 @@ function refreshLogs( data)
  */
 function loadPeople( sprint, callback)
 {
-	$.getJSON( peopleListUrl + '?sprint_id=' + sprint, 
+	$.getJSON( peopleListUrl + '?action=list&sprint_id=' + sprint, 
 			function( peopleList) {
 				currentPeople = new Array();
 				$.each( peopleList, function( index, resource){

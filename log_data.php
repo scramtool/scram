@@ -30,7 +30,6 @@ function get_logs( &$parameters)
 	$database->get_result_table(get_log_query( $sprint_id, $start_date, $end_date), $headers, $logs);
 	
 	return json_encode($logs);
-	
 }
 
 print dispatch_command( $_GET, 'action', array( 'get' => 'get_logs'));

@@ -1,18 +1,41 @@
 <?php
 //
-//  Copyright (C) 2012 Danny Havenith
+//  Copyright (C) 2012, 2013 Danny Havenith
 //
 //  Distributed under the Boost Software License, Version 1.0. (See
 //  accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 //
-
 require_once 'connect_db.inc.php';
+require_once 'utilities.inc.php';
 
-function print_people_data( $sprint_id)
+function list_person_tasks( &$parameters)
+{
+    global $database;
+    $sprint_id = get_escape_if_defined( $database, $parameters, 'sprint_id');
+    $person_id = get_escape_if_defined( $database, $parameters, 'resource_id');
+    
+    $query = <<<EOT
+    SELECT *
+    FROM report
+    JOIN task ON report.task_id = task.task_id
+    WHERE report.resource_id = $person_id
+    AND sprint_id = $sprint_id
+    ORDER BY task.task_id, date
+EOT;
+    
+    $headers = array();
+    $table = array();
+    $database->get_result_table($query, $headers, $table);
+    
+    return json_encode($table);
+}
+
+function list_people( &$parameters)
 {
 	global $database;
-
+    $sprint_id = get_escape_if_defined( $database, $parameters, 'sprint_id');
+    
 	$query = <<<EOT
 SELECT name, resource.resource_id
 FROM resource
@@ -27,11 +50,7 @@ EOT;
 	$table = array();
 	$database->get_result_table($query, $headers, $table);
 	
-	print json_encode($table);
+	return json_encode($table);
 }
 
-if (isset( $_GET['sprint_id']))
-{
-	$sprint_id = $_GET['sprint_id'];
-	print_people_data($sprint_id);
-}
+print dispatch_command( $_GET, 'action', array( 'list' => 'list_people', 'tasks' => 'list_person_tasks'));

@@ -10,7 +10,7 @@
 require_once 'connect_db.inc.php';
 require_once 'utilities.inc.php';
 /**
- * 
+ * NOT IN USE ANYMORE
  * Create the query text for a query that generates the dates for all weekdays in a sprint period.
  * @param unknown_type $sprint_id
  * @return string

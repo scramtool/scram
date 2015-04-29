@@ -52,6 +52,18 @@ function get_if_defined( &$array, $index, $ifnotdefined = null)
 }
 
 /**
+ * Same as get_if_defined(), but will escape any string that is returned, using the databases escape method.
+ * @param unknown $database
+ * @param unknown $array
+ * @param unknown $index
+ * @param string $ifnotdefined
+ */
+function get_escape_if_defined( &$database, &$array, $index, $ifnotdefined = null)
+{
+    return $database->escape( get_if_defined($array, $index, $ifnotdefined));
+}
+
+/**
  * Get the user id that is associated with the given user name.
  * 
  * If no user (resource) exists yet with that name in that database, one will be created.
