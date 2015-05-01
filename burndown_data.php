@@ -94,62 +94,31 @@ function get_available_query( $sprint_id, $task_id = 0)
 }
 
 /**
- * Output the results of the burndown-query to standard output in a table format.
+ * Output the results of the burndown-query to standard output in csv-format.
  * 
  * @param unknown_type $sprint_id
  */
 function print_burndown_query( $sprint_id)
 {
 	global $database;
-	$sprint_info = $database->get_single_result( "SELECT * FROM sprint WHERE sprint_id = $sprint_id");
-	
-	$last_day = $sprint_info['end_date'];
-	$first_day = $sprint_info['start_date'];
 	$query = $database->exec( get_burndown_query($sprint_id));
 	$fields = $database->num_fields($query);
 	
-	print "<table>\n";
-	print "<tr>";
 	for ($field = 1; $field <= $fields; ++$field)
 	{
-		print '<th>'. $database->field_name($query, $field) . '</th>';
+		print $database->field_name($query, $field) . ',';
 	}
-	print "<th>target</th>";
-	print "</tr>\n";
+	print "\n";
 	
-	$last_day_printed = false;
 	while ($database->fetch_row($query))
 	{
-		print '<tr>';
 		for ($field = 1; $field <= $fields; ++$field)
 		{
-			print '<td>' . $database->result( $query, $field) . '</td>';
+			print $database->result( $query, $field) . ',';
 		}
-		$date = $database->result( $query, 1);
-		if ($date < $first_day)
-		{
-			print '<td>' . $database->result( $query, 2) . "</td>";
-		}
-		else if ( $date == $last_day)
-		{
-			print "<td>0</td>";
-			$last_day_printed = true;
-		}
-		else 
-		{
-			print "<td/>";
-		}
-		print "</tr>\n";
+		print "\n";
 	}
-	
-	if (!$last_day_printed)
-	{
-		print "<tr><td>$last_day</td><td/><td/><td>0</td></tr>\n";
-	}
-	
-	print "</table>\n";
 }
-
 
 /**
  * Output the results of the burndown-query to standard output in json format.
@@ -182,7 +151,7 @@ if (isset( $_GET['sprint_id']))
 		print_chart_data( $sprint_id);
 	}
 }
-else 
-{
-	print_burndown_query( 23);
+else {
+	print "burndown data\n";
+	print_burndown_query(1);
 }

@@ -39,7 +39,7 @@ function getTask( id)
  * @param sprint numerical id of the sprint for which to load all tasks
  */
 function loadTasks( sprint, callback) {
-	$.getJSON( taskListUrl + '?sprint_id=' + sprint, 
+	$.getJSON( taskListUrl + '?sprint_id=' + sprint,
 			function( tasklist) {
 				currentTasks = new Array();
 				$.each( tasklist, function( index, task){
@@ -67,7 +67,7 @@ function loadTaskTable( sprint_id, table_name) {
 		                 { "bVisible": false, "aTargets": [ 0,1,4,5 ] },
 		                 { "sWidth":"10%", "aTargets": [ -1 ] }
 		               ]
-	} );	
+	} );
 	$(window).bind('resize', function () {
 		$('#' + table_name).dataTable().fnAdjustColumnSizing();
 	  } );
@@ -107,7 +107,7 @@ function refreshLogs( data)
 			lastPerson = log.name;
 			currentPeronsMarkup.show();
 		}
-		
+
 	});
 }
 
@@ -118,14 +118,14 @@ function refreshLogs( data)
  */
 function loadPeople( sprint, callback)
 {
-	$.getJSON( peopleListUrl + '?action=list&sprint_id=' + sprint, 
+	$.getJSON( peopleListUrl + '?action=list&sprint_id=' + sprint,
 			function( peopleList) {
 				currentPeople = new Array();
 				$.each( peopleList, function( index, resource){
 					currentPeople['x' + resource.resource_id] = resource;
 				});
 				callback();
-			});	
+			});
 }
 
 /**
@@ -135,7 +135,7 @@ function loadPeople( sprint, callback)
  */
 function loadSprintDetails( sprint, callback)
 {
-	$.getJSON( sprintDetailsUrl + '?action=get&sprint_id=' + sprint, callback);	
+	$.getJSON( sprintDetailsUrl + '?action=get&sprint_id=' + sprint, callback);
 }
 
 /**
@@ -149,27 +149,27 @@ function refreshSprintDetails( sprint)
 
 /**
  * Submit a form with data for a new task to the server.
- * If the server accepts the data, a new task object will be asynchronously returned. This task object 
+ * If the server accepts the data, a new task object will be asynchronously returned. This task object
  * is added to the global array currentTasks and then given to the callback parameter.
- * 
+ *
  * Note that the form from which the data is submitted should have inputs with
  * exactly the right names.
- * 
+ *
  * @param form
  */
 function submitNewTaskForm(form, callback)
 {
 	var query = "";
-	
+
 	var task = new Array();
-	form.find("input, textarea").each( 
+	form.find("input, textarea").each(
 			function(index, element) {
 				value =  encodeURIComponent( element.value);
 				name = element.name;
 				query += '&' + name + "=" + value;
 				task[name] = element.value;
 				});
-	
+
 	if (!task.estimate) task.estimate = 8;
 	if (task.description && task.description.length != 0)
 	{
@@ -185,22 +185,22 @@ function submitNewTaskForm(form, callback)
 }
 
 /**
- * This function is called when the submit new task-button is pressed in the sprint details page. 
+ * This function is called when the submit new task-button is pressed in the sprint details page.
  * $(this) references the button.
  * The button is supposed to be in a form. This function will retreive all values in that form and create an
  * ajax GET-request that should add the task to the database.
- * 
+ *
  * Beware: this function makes quite a few assumptions about the form that holds the submit-button.
  * @returns {Boolean}
  */
 function submitNewTask( )
 {
-	submitNewTaskForm( $(this).parent(), 
+	submitNewTaskForm( $(this).parent(),
 			function (task)
 			{
 				var table = $('#taskTable').dataTable();
 				table.fnAddData([
-				                 task.task_id, task.sprint_id, 
+				                 task.task_id, task.sprint_id,
 				                 task.description, task.status,
 				                 task.resource_id, "",task.name,
 				                 0, task.estimate, task.estimate, task.estimate
@@ -211,7 +211,7 @@ function submitNewTask( )
 	$('form input').val("");
 	$('form #estimate').val("8");
 	$('.firstToFocus').focus();
-	
+
 	return false;
 
 }
@@ -254,7 +254,7 @@ function submitText( value, settings)
     	 		currentTasks['x'+taskText.task_id].description = taskText.text;
 				$("#description-for-" + taskText.task_id).html( taskText.text);
 			});
-     
+
      //return settings.submitdata.task_id + ' : ' + value;
      return '<img class="centered" src="images/ajax-loader.gif"/>';
 }
@@ -281,7 +281,7 @@ function makeEditable( index, value)
 
 /**
  * Given a container name (the name of a <li> item for a task), extract the task id.
- * This function assumes a specific format of the container name, such as 
+ * This function assumes a specific format of the container name, such as
  * 'container-for-<task_id>'.
  * @param containerId
  * @returns numerical task id.
@@ -297,7 +297,7 @@ function containerIdToTaskId( containerId)
 /**
  * Create the markup for a task detail form.
  * At some point I should probably merge this code with that of makeTaskMarkup.
- * 
+ *
  * @param task
  * @returns {String} html for the task form.
  */
@@ -315,8 +315,8 @@ function makeTaskFormMarkup( task)
 	{
 		burnt = 0;
 	}
-	
-	var html = 
+
+	var html =
 '	<form id="form-for-' + task.id + '">'+
 '	<div id="taskForm" class="yellowNote">'+
 '	<div class="taskNumbers">'+
@@ -329,7 +329,7 @@ function makeTaskFormMarkup( task)
 '	    <input type="hidden" id="id" name = "id" value="' + task.task_id+ '">'+
 '	    <input type="hidden" id="estimate-original" name = "estimate-original" value="' + task.estimate+ '"/>'+
 '	    <input type="hidden" id="spent-original" name = "spent-original" value="' + burnt+ '"/>'+
-'       <input type="hidden" name="ref_date" id="ref-date" value="' + today_string + '"/>' + 
+'       <input type="hidden" name="ref_date" id="ref-date" value="' + today_string + '"/>' +
 '	    <label for="estimate">left:</label>'+
 '	    <input type="text" id="estimate" name = "estimate" class="estimate positive-integer show-changes" value="' + task.estimate+ '">'+
 '	    <label for="spent">&nbsp;spent today:</label>'+
@@ -352,7 +352,7 @@ function makeTaskFormMarkup( task)
 function updateTask(task)
 {
 	currentTasks['x'+task.task_id] = task;
-	
+
 	// can we find the <li>-item that should contain the task, if not create one
 	var container = $("#container-for-" + task.task_id);
 	if (container.length != 0)
@@ -362,14 +362,14 @@ function updateTask(task)
 	else {
 		container = createTaskListItem( task);
 	}
-	
+
 	// determine in which section to place the <li>
 	var target = task.status + "List";
 	if (worksOnTask(member_id, task)) target = "myTasks";
-	
+
 	// if the task is not in the right container, we move it there
 	if (container.parent("#" + target).length == 0) {
-		container.prependTo( "#" + target);				
+		container.prependTo( "#" + target);
 	}
 	setAdvancedUIBehaviour();
 }
@@ -385,8 +385,8 @@ function showTaskDialog()
 	var id = containerIdToTaskId($(this).attr('id'));
 	var taskForm = $(makeTaskFormMarkup(getTask(id)));
 	taskForm.append('<div class="smallChart" style="width:400px;height:200px" id="taskBurnDown" ></div>');
-	
-	
+
+
 	if (typeof theModalDialog == 'undefined') {
 		theModalDialog = $("<div />");
 	}
@@ -400,12 +400,12 @@ function showTaskDialog()
 			$(this).dialog( 'close');
 			}}]
 	});
-	
+
 	// select all when entering a form input
 	theModalDialog.find('textarea, input').focus( function (){$(this).select();});
 	// focus on the first field.
 	theModalDialog.find('#member_name').focus();
-	
+
 	setAdvancedUIBehaviour();
 	loadTaskCharts( sprint_id, id, null, 'taskBurnDown');
 
@@ -415,7 +415,7 @@ function showTaskDialog()
 function createEmptyTask()
 {
 	var task = {
-			"sprint_id": sprint_id, 
+			"sprint_id": sprint_id,
 			"description":"",
 			"status":"",
 			"resource_id":member_id,
@@ -428,15 +428,15 @@ function createEmptyTask()
 }
 
 /**
- * Create a dependency between two numerical inputs where if the value of one ('destination') changes, 
- * its delta will be subtracted from the other ('source'). If source changes, those changes will not influence 
- * 'destination'. 
+ * Create a dependency between two numerical inputs where if the value of one ('destination') changes,
+ * its delta will be subtracted from the other ('source'). If source changes, those changes will not influence
+ * 'destination'.
  * @param source
  * @param destination
  */
 function siphon( source, destination)
 {
-	// this makes use of the fact that the attribute 'value' contains the original value while the 
+	// this makes use of the fact that the attribute 'value' contains the original value while the
 	// _property_ 'value' contains the new value.
 	destination.change( function(){
 		var oldValue = $(this).attr('value');
@@ -457,18 +457,18 @@ function showSplitTaskDialog()
 	var destinationTask = createEmptyTask();
 	destinationTask.status = sourceTask.status;
 	destinationTask.description = sourceTask.description;
-	
+
 	var sourceTaskDiv = $('<div/>').addClass('sideBySideTask').html( makeTaskFormMarkup( sourceTask));
 	var destinationTaskDiv = $('<div/>').addClass('sideBySideTask').html(makeTaskFormMarkup( destinationTask));
-	
+
 	var dialog = $('<div/>').append( sourceTaskDiv).append( destinationTaskDiv);
 	dialog.dialog({
 		modal : true,
 		width : 920,
 		height: 240,
 		buttons: [
-		          { 
-		        	  text:"OK", 
+		          {
+		        	  text:"OK",
 		        	  click: function () {
 		        		  postTaskUpdates( sourceTaskDiv.find('form'));
 		        		  submitNewTaskForm( destinationTaskDiv.find('form'), updateTask);
@@ -476,7 +476,7 @@ function showSplitTaskDialog()
 		        	  }
 		          }
 		          ]
-	});	
+	});
 	//destinationTaskDiv.toggle('slide');
 	dialog.find('textarea, input').focus( function (){$(this).select();});
 	destinationTaskDiv.find('#member_name').focus();
@@ -509,15 +509,15 @@ function showNewTaskDialog()
 		width : 512,
 		height: 240,
 		buttons: [
-		          { 
-		        	  text:"OK", 
+		          {
+		        	  text:"OK",
 		        	  click: function () {
 		        		  submitNewTaskForm( $(this).find('form'), updateTask);
 		        		  $(this).dialog( 'close');
 		        	  }
 		          }
 		          ]
-	});	
+	});
 	dialog.find('textarea, input').focus( function (){$(this).select();});
 	dialog.find('#member_name').focus();
 	setAdvancedUIBehaviour();
@@ -547,7 +547,7 @@ function addMenus()
 		selector : '.taskNote',
 		callback : menuClicked,
 		items: {
-			"move": { 
+			"move": {
 				"name": "Move to",
 				"items": {
 					"toDo": {name: "To Do", callback: moveItem},
@@ -555,16 +555,16 @@ function addMenus()
 					"toBeVerified": { name: "To Be Verified", callback: moveItem},
 					"done" : { name: "Done", callback: moveItem},
 					"forwarded" : { name: "Forwarded", callback: moveItem}
-				
+
 				},
 				"icon": "paste"
 			},
 			"split" : { name: "Split", callback : showSplitTaskDialog},
 			"details": { name: "Details", callback: showTaskDialog }
-		
+
 		}
 	});
-	
+
 	$.contextMenu({
 		selector: '.categoryContent',
 		callback : menuClicked,
@@ -579,7 +579,7 @@ function addMenus()
  * extra javascript to set up. It is safe to call this function multiple times on a page.
  * This function searches the page for elements with particular classes and attaches the required behavior. Currently
  * supported behaviour-classes are :
- * 
+ *
  * submitReportButton: a small button with icon and no text, inside a task div that will call submitEstimate() when pressed
  * taskDetails:        a div that becomes editable when double-clicked
  * positive-integer:   a text input that only allows positive integers to be entered.
@@ -588,16 +588,16 @@ function addMenus()
 function setAdvancedUIBehaviour()
 {
 	$(".submitReportButton").button( {icons: {primary: "ui-icon-disk"}, text:false}).unbind('click').click( submitEstimate);
-	$('.taskDetails').each( makeEditable); 
-	$(".positive-integer").numeric({ decimal: false, negative: false }, function() { 
-		alert("Positive integers only"); this.value = ""; this.focus(); 
+	$('.taskDetails').each( makeEditable);
+	$(".positive-integer").numeric({ decimal: false, negative: false }, function() {
+		alert("Positive integers only"); this.value = ""; this.focus();
 		});
 	$( ".memberName" ).autocomplete({
 		source: "names.php",
 		autoFocus: true,
 		minLength: 1
-		});	
-	
+		});
+
 	addMenus();
 	$(".show-changes").change(changedMarkup);
 }
@@ -609,7 +609,7 @@ function refreshTaskUi()
 {
 	// clear all scrumboards
 	$(".scrumBoardTasks ul").html("");
-	
+
 	// now send the tasks to their appropriate scrumboard.
 	for (var task_key in currentTasks)
 	{
@@ -639,15 +639,37 @@ function refreshTaskUi()
  */
 function addPersonToList( person, listName)
 {
-	var item = 
-		$('<li/>', 
+	var item =
+		$('<li/>',
 			{
-				'class': 'personNote', 
-				'id':'container-for-person-' + person.resource_id, 
+				'class': 'personNote',
+				'id':'container-for-person-' + person.resource_id,
 				'html':makePersonMarkup( person)
 			}
 		);
 	item.appendTo( listName);
+}
+
+/**
+ * Given a task object, create either an anchor that points to an external link, or
+ * if the task has no external reference, or there is no externalurl defined, create an empty string.
+ *
+ * @param task
+ */
+function makeExternalLink( task) {
+	var externalUrl = 'https://jira.mapscape.nl/browse/';
+	if (externalUrl && task.external_link )
+	{
+		return $('<a/>', {
+			'class': 'externalReference',
+			'html' : task.external_link
+		})
+		.attr('href', externalUrl + task.external_link)
+		.prop('outerHTML');
+	}
+	else {
+		return ""
+	}
 }
 
 /**
@@ -660,13 +682,13 @@ function addPersonToList( person, listName)
 function makeTaskMarkup( task, isInWorkList)
 {
 	var note_class = "note yellowNote";
-	
+
 	// the 'title bar' of the task, including the estimate number and the name of the assignee
 	var reported_time = $('<div class="clickable estimate frozen">' + task.estimate + '</div><div>&nbsp;&nbsp;&nbsp;</div><div>' + task.name+ '</div>');
-	
+
 	// create the complete 'title bar' with header and sliding form
 	var title_bar = $('<div class="taskNumbers"/>').append( reported_time);
-	
+
 	// if this is a task of the current user and it it either in progress or to be verified, add
 	// a form to allow submitting new estimates.
 	if (isInWorkList) {
@@ -679,7 +701,7 @@ function makeTaskMarkup( task, isInWorkList)
 			'<div class="overlay">' +
 			'<form class = "taskNumberForm">'+
 			' <input type="hidden" class="holdsTaskId" name="task_id" value="' + task.task_id + '"/>' +
-			' <input type="hidden" name="ref_date" id="ref-date" value="' + today_string + '"/>' + 
+			' <input type="hidden" name="ref_date" id="ref-date" value="' + today_string + '"/>' +
 			' <input type="hidden" id="estimate-original" value="' + task.estimate + '"/>' +
 			' <input type="hidden" id="spent-original" value="0"/>' +
 			' <label for="estimate">left:</label><div class="holdClick"><input type="text"  id="estimate" name="estimate" class="estimate positive-integer show-changes" value="' + task.estimate + '"/> </div>'+
@@ -688,19 +710,19 @@ function makeTaskMarkup( task, isInWorkList)
 			'</form>'+
 			'</div>'
 			);
-		
+
 		// make sure that clicking in the tasknumber fields doesn't slide the whole form out of view.
-		report_form.find('.holdClick').click( function(e){ 
-			e.stopPropagation(); 
+		report_form.find('.holdClick').click( function(e){
+			e.stopPropagation();
 			return false;
 			});
-		
+
 
 		if (isOnSameDay( report_date, today))
 		{
 			report_form.find('#spent, #spent-original').val( task.burnt);
 			report_form.hide();
-		}	
+		}
 
 		title_bar
 			.append( report_form)
@@ -709,8 +731,8 @@ function makeTaskMarkup( task, isInWorkList)
 					$(this).children('.overlay').toggle( 'slide', {direction:"up"}, 200);
 				});
 	}
-	
-	
+
+
 	if (task.resource_id == member_id)
 	{
 		note_class = "note greenNote";
@@ -722,13 +744,16 @@ function makeTaskMarkup( task, isInWorkList)
 			note_class = note_class + " someoneElses";
 		}
 	}
-	
-	var markup = $('<div class="' + note_class + '"/>').append( title_bar).append('<div id="description-for-' 
-	+ task.task_id + '" class="taskDetails">' + task.description  +'</div>');
-	
+
+	var markup = $('<div class="' + note_class + '"/>')
+		.append( title_bar)
+		.append('<div id="description-for-'+ task.task_id + '" class="taskDetails">' +  task.description  +'</div>');
+
+	markup
+		.append($('<div class="externalLinkDiv"/>').html(makeExternalLink( task)));
+
 	markup.children('.taskNumbers').append('<br style="clear:both" />');
-		
-	
+
 	return markup;
 }
 
@@ -738,20 +763,20 @@ function makeTaskMarkup( task, isInWorkList)
  * If the value of that element is different than the source element, the source element
  * will get the additional style 'changed'. If the values are the same, the 'changed' style will be removed
  * if present.
- * 
+ *
  * It would have been possible to compare the value attribute with the value property instead of relying
  * on an additional hidden input, but that won't work with some older IE browsers.
  */
-function changedMarkup() 
+function changedMarkup()
 {
 	// find the input with id '<source element id>-original'
 	var originalId = '#' + $(this).prop('id') + '-original';
 	var originalInput = $(this).siblings( originalId);
-	
+
 	// get the original value and the new value
 	var original = originalInput.val();
 	var current = $(this).val();
-	
+
 	// apply the 'changed' style, if applicable.
 	if ( original == current) {
 		$(this).removeClass('changed');
@@ -813,10 +838,10 @@ function addTaskToList( task, listName)
  */
 function createTaskListItem( task)
 {
-	return $('<li/>', 
+	return $('<li/>',
 			{
-				'class': 'taskNote', 
-				'id':'container-for-' + task.task_id, 
+				'class': 'taskNote',
+				'id':'container-for-' + task.task_id,
 				'html':makeTaskMarkup( task, isTaskEstimateable(member_id, task))
 			}
 
@@ -824,20 +849,20 @@ function createTaskListItem( task)
 }
 
 /**
- * This function refreshes the task list of the sprint overview page after a reload of 
+ * This function refreshes the task list of the sprint overview page after a reload of
  * the tasks.
  */
 function refreshSprintTasks()
 {
 	// clear all scrumboards
 	$("#sprintTasks").html("");
-	
+
 	// now send the tasks to their appropriate scrumboard.
 	for (var task_key in currentTasks)
 	{
 		addTaskToList( currentTasks[task_key], "#sprintTasks");
 	}
-	
+
 	setAdvancedUIBehaviour();
 }
 
@@ -845,13 +870,13 @@ function refreshSprintPeople()
 {
 	// clear the people list
 	$("#sprintPeople").html("");
-	
+
 	// now add each person to the people list
 	for (var person_key in currentPeople)
 	{
 		addPersonToList( currentPeople[person_key], "#sprintPeople");
 	}
-	
+
 }
 
 /**
@@ -861,13 +886,13 @@ function refreshSprintPeople()
  */
 function submitTaskChanges( newValues, allowMove) {
 	var task_id = newValues.task_id;
-	
+
 	// try to find out if estimates have changed as well, in which case we need to submit those changes
 	// together with the move.
 	var changedSelector = '#container-for-'+task_id+' .changed';
 	var changedEstimates = $( changedSelector).length;
 	$(changedSelector).removeClass('changed'); // un-mark as changed.
-	
+
 	// if estimates were changed, we also need to upload the new estimates.
 	if (changedEstimates) {
 		newValues.spent = $('#container-for-'+task_id+' #spent').val();
@@ -883,8 +908,8 @@ function submitTaskChanges( newValues, allowMove) {
 				currentTasks['x'+task.task_id] = task;
 				$("#container-for-" + task.task_id).html( makeTaskMarkup( task, isTaskEstimateable(member_id, task)));
 				var target = newValues.status + "List";
-				if (worksOnTask(member_id, task)) target = "myTasks"; 
-				if (allowMove) $("#container-for-" + task.task_id).prependTo( "#" + target);				
+				if (worksOnTask(member_id, task)) target = "myTasks";
+				if (allowMove) $("#container-for-" + task.task_id).prependTo( "#" + target);
 				setAdvancedUIBehaviour();
 			});
 }
@@ -901,7 +926,7 @@ function noteReceived( event, ui)
 	var new_status = $(this).attr("id").replace('List', '');
 	var old_status = $(ui.sender).attr("id").replace('List','');
 	var to_mytasks = false;
-	
+
 	if (new_status == 'inProgress' && old_status == 'myTasks' )
 	{
 		$(ui.sender).sortable('cancel');
@@ -928,7 +953,7 @@ function noteReceived( event, ui)
 
 function isTaskEstimateable( resourceId, taskInfo)
 {
-	return taskInfo.resource_id == resourceId && 
+	return taskInfo.resource_id == resourceId &&
 		((taskInfo.status == 'inProgress') || taskInfo.status == 'toBeVerified');
 }
 
@@ -940,12 +965,12 @@ function isTaskEstimateable( resourceId, taskInfo)
  */
 function worksOnTask( resourceId, taskInfo)
 {
-	return taskInfo.resource_id == resourceId && 
+	return taskInfo.resource_id == resourceId &&
 	    (taskInfo.status == 'inProgress');
 }
 
 /**
- * Determine whether two DateTimes are on the same day. 
+ * Determine whether two DateTimes are on the same day.
  * @param date1
  * @param date2
  * @returns {Boolean}
